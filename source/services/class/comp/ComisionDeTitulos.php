@@ -5,6 +5,26 @@ require("Base.php");
 
 class class_ComisionDeTitulos extends class_Base
 {
+	
+	
+  public function method_guardar_titulos($params, $error) {
+  	$p = $params[0];
+  	
+	foreach ($p->titulo as $row) {
+			$sql = "INSERT tomo_espacios SET";
+			$sql.= "  id_espacio='" . $p->espacio->model . "'";
+			$sql.= ", cod_espacio='" . $p->espacio->codigo . "'";
+			$sql.= ", id_carrera='" . $p->carrera->model . "'";
+			$sql.= ", cod_carrera='" . $p->carrera->codigo . "'";
+			$sql.= ", id_titulo='" . $row->id_titulo . "'";
+			$sql.= ", cod_titulo='" . $row->cod_titulo . "'";
+			$sql.= ", id_tipo_titulo='" . $row->id_tipo_titulo . "'";
+			$sql.= ", cod_tipo_titulo='" . $row->cod_tipo_titulo . "'";
+			$sql.= ", id_tipo_clasificacion='" . $row->id_tipo_clasificacion . "'";
+			
+			$this->mysqli->query($sql);
+	}
+  }
 
 
   public function method_leer_titulos($params, $error) {
@@ -59,7 +79,7 @@ class class_ComisionDeTitulos extends class_Base
   	
 	$rs = $this->mysqli->query($sql);
 	while ($row = $rs->fetch_object()) {
-		unset($row->denominacion);
+		//unset($row->denominacion);
 		
 		$resultado[] = $row;
 	}
@@ -90,7 +110,7 @@ class class_ComisionDeTitulos extends class_Base
 	
 	$rs = $this->mysqli->query($sql);
 	while ($row = $rs->fetch_object()) {
-		unset($row->nombre);
+		//unset($row->nombre);
 		
 		$resultado[] = $row;
 	}
