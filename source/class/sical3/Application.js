@@ -139,7 +139,7 @@ qx.Class.define("sical3.Application",
 		this.login = data;
 		
 		//alert(qx.lang.Json.stringify(data, null, 2));
-		//alert("antes");
+
 		this._InitAPP();
 	}, this));
 	
@@ -182,7 +182,9 @@ qx.Class.define("sical3.Application",
 	
 
 	
-	
+	var pageCategorizacionEspaciosTitulos;
+	var pageNovedadesTomoCargos;
+	var pageNovedadesTomoEspacios;
 	
 	
 	var numberformatMontoEs = this.numberformatMontoEs = new qx.util.format.NumberFormat("es");
@@ -203,6 +205,7 @@ qx.Class.define("sical3.Application",
 
 	var contenedorMain = new qx.ui.container.Composite(new qx.ui.layout.Grow());
 	var tabviewMain = this.tabviewMain = new qx.ui.tabview.TabView();
+	doc.add(tabviewMain, {left: 0, top: 33, right: 0, bottom: 0});
 	
 	//contenedorMain.add(tabviewMain);
 	
@@ -221,17 +224,48 @@ qx.Class.define("sical3.Application",
 	mnuArchivo.add(btnAcercaDe);
 	
 	
-	var mnuEdicion = new qx.ui.menu.Menu();
+	var mnuComisionDeTitulos = new qx.ui.menu.Menu();
 	
-	if (this.login._usuario_organismo_area_id == "6") {
-		var btnCategorizacionEspaciosTitulos = new qx.ui.menu.Button("Categorización de Espacios en Títulos...");
-		btnCategorizacionEspaciosTitulos.addListener("execute", function(){
-			var page = new sical3.comp.pageCatEspTit();
-			tabviewMain.add(page);
-			tabviewMain.setSelection([page]);
-		});
-		mnuEdicion.add(btnCategorizacionEspaciosTitulos);
-	}
+	var btnCategorizacionEspaciosTitulos = new qx.ui.menu.Button("Categorización de Espacios en Títulos...");
+	btnCategorizacionEspaciosTitulos.addListener("execute", function(){
+		if (pageCategorizacionEspaciosTitulos == null) {
+			pageCategorizacionEspaciosTitulos = new sical3.comp.pageCategorizacionEspaciosTitulos();
+			pageCategorizacionEspaciosTitulos.addListenerOnce("close", function(e){
+				pageCategorizacionEspaciosTitulos = null;
+			});
+			tabviewMain.add(pageCategorizacionEspaciosTitulos);
+		}
+		tabviewMain.setSelection([pageCategorizacionEspaciosTitulos]);
+	});
+	mnuComisionDeTitulos.add(btnCategorizacionEspaciosTitulos);
+	
+	
+	
+	var btnNovedadesTomoCargos = new qx.ui.menu.Button("Novedades Tomo cargos...");
+	btnNovedadesTomoCargos.addListener("execute", function(){
+		if (pageNovedadesTomoCargos == null) {
+			pageNovedadesTomoCargos = new sical3.comp.pageNovedadesTomoCargos();
+			pageNovedadesTomoCargos.addListenerOnce("close", function(e){
+				pageNovedadesTomoCargos = null;
+			});
+			tabviewMain.add(pageNovedadesTomoCargos);
+		}
+		tabviewMain.setSelection([pageNovedadesTomoCargos]);
+	});
+	mnuComisionDeTitulos.add(btnNovedadesTomoCargos);
+	
+	var btnNovedadesTomoEspacios = new qx.ui.menu.Button("Novedades Tomo espacios...");
+	btnNovedadesTomoEspacios.addListener("execute", function(){
+		if (pageNovedadesTomoEspacios == null) {
+			pageNovedadesTomoEspacios = new sical3.comp.pageNovedadesTomoEspacios();
+			pageNovedadesTomoEspacios.addListenerOnce("close", function(e){
+				pageNovedadesTomoEspacios = null;
+			});
+			tabviewMain.add(pageNovedadesTomoEspacios);
+		}
+		tabviewMain.setSelection([pageNovedadesTomoEspacios]);
+	});
+	mnuComisionDeTitulos.add(btnNovedadesTomoEspacios);
 	
 
 
@@ -253,13 +287,17 @@ qx.Class.define("sical3.Application",
 	var mnubtnArchivo = new qx.ui.toolbar.MenuButton('Archivo');
 	
 	var mnubtnEdicion = new qx.ui.toolbar.MenuButton('');
-	if (this.login._usuario_organismo_area_id == "6") mnubtnEdicion = new qx.ui.toolbar.MenuButton('Comisión de Títulos');
+	
+	if (this.login._usuario_organismo_area_id == "6") {
+		mnubtnEdicion = new qx.ui.toolbar.MenuButton('Comisión de Títulos');
+		mnubtnEdicion.setMenu(mnuComisionDeTitulos);
+	}
 	
 	var mnubtnSesion = new qx.ui.toolbar.MenuButton('Sesión');
 
 	
 	mnubtnArchivo.setMenu(mnuArchivo);
-	mnubtnEdicion.setMenu(mnuEdicion);
+	
 	mnubtnSesion.setMenu(mnuSesion);
 	  
 	
@@ -273,21 +311,21 @@ qx.Class.define("sical3.Application",
 	
 	doc.add(toolbarMain, {left: 5, top: 0, right: "50%"});
 	
-	//doc.add(new qx.ui.basic.Label("Org/Area: " + this.rowOrganismo_area.label), {left: "51%", top: 5});
-	//doc.add(new qx.ui.basic.Label("Usuario: " + this._SYSusuario), {left: "51%", top: 25});
+	doc.add(new qx.ui.basic.Label("Usuario: " + this.login._usuario), {left: "51%", top: 5});
+	doc.add(new qx.ui.basic.Label("Org/Area: " + this.login._usuario_organismo_area), {left: "51%", top: 25});
 	
 	
 	//doc.add(contenedorMain, {left: 0, top: 33, right: 0, bottom: 0});
-	doc.add(tabviewMain, {left: 0, top: 33, right: 0, bottom: 0});
+	//doc.add(tabviewMain, {left: 0, top: 33, right: 0, bottom: 0});
 	
 	//var pageGeneral = this.pageGeneral = new vehiculos.comp.pageGeneral();
 	//tabviewMain.add(pageGeneral);
 	//tabviewMain.setSelection([pageGeneral]);
 	
 	
-	var page = new sical3.comp.pageCatEspTit();
-	tabviewMain.add(page);
-	tabviewMain.setSelection([page]);
+	//var page = new sical3.comp.pageCatEspTit();
+	//tabviewMain.add(page);
+	//tabviewMain.setSelection([page]);
 	
 	
 	

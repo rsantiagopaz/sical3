@@ -1,4 +1,4 @@
-qx.Class.define("sical3.comp.pageCatEspTit",
+qx.Class.define("sical3.comp.pageCategorizacionEspaciosTitulos",
 {
 	extend : qx.ui.tabview.Page,
 	construct : function ()
@@ -6,6 +6,7 @@ qx.Class.define("sical3.comp.pageCatEspTit",
 	this.base(arguments);
 
 	this.setLabel('Categorización de Espacios en Títulos');
+	this.toggleShowCloseButton();
 	this.setLayout(new qx.ui.layout.Canvas());
 	
 	this.addListenerOnce("appear", function(e){
@@ -458,7 +459,7 @@ qx.Class.define("sical3.comp.pageCatEspTit",
 	for (var x in application.tipo_titulo) aux[application.tipo_titulo[x].id_tipo_titulo] = application.tipo_titulo[x].descrip;
 	
 	var cellrendererReplace = new qx.ui.table.cellrenderer.Replace();
-	//var cellrendererReplace = new defineMultiLineCellReplace();
+	cellrendererReplace.setDefaultCellStyle("display: table-cell; vertical-align: middle; position: relative;");
 	cellrendererReplace.setReplaceMap(aux);
 	tableColumnModelDest.setDataCellRenderer(3, cellrendererReplace);
 	
@@ -494,7 +495,8 @@ qx.Class.define("sical3.comp.pageCatEspTit",
 
 
 	var gbxTitulo = new qx.ui.groupbox.GroupBox("Agregar título");
-	gbxTitulo.setLayout(new qx.ui.layout.Grid(6, 6));
+	var l = new qx.ui.layout.Grid(6, 6);
+	gbxTitulo.setLayout(l);
 	this.add(gbxTitulo, {left: "53%", right: 0, bottom: 0});
 
 
@@ -509,7 +511,8 @@ qx.Class.define("sical3.comp.pageCatEspTit",
 
 		}
 	}, this);
-	gbxTitulo.add(cboTitulo, {row: 0, column: 1, colSpan: 30});
+	gbxTitulo.add(cboTitulo, {row: 0, column: 1, colSpan: 4});
+	l.setColumnFlex(1, 1);
 	
 	
 	
@@ -522,17 +525,19 @@ qx.Class.define("sical3.comp.pageCatEspTit",
 		slbTipo_clasificacion.add(new qx.ui.form.ListItem(application.tipo_clasificacion[x].descrip, null, application.tipo_clasificacion[x]));
 	}
 	gbxTitulo.add(slbTipo_clasificacion, {row: 1, column: 1});
+	l.setColumnFlex(1, 1);
 	
 	
 	
-	gbxTitulo.add(new qx.ui.basic.Label("Tipo título:"), {row: 1, column: 3});
+	gbxTitulo.add(new qx.ui.basic.Label("Tipo título:"), {row: 1, column: 2});
 	
 	var slbTipo_titulo = new qx.ui.form.SelectBox();
 	for (var x in application.tipo_titulo) {
 		//var item = new qx.ui.form.ListItem(application.tipo_clasificacion[x].denominacion, null, application.tipo_clasificacion[x]);
 		slbTipo_titulo.add(new qx.ui.form.ListItem(application.tipo_titulo[x].descrip, null, application.tipo_titulo[x]));
 	}
-	gbxTitulo.add(slbTipo_titulo, {row: 1, column: 4});
+	gbxTitulo.add(slbTipo_titulo, {row: 1, column: 3});
+	l.setColumnFlex(3, 1);
 	
 	
 	var btnAgregar = new qx.ui.form.Button("Agregar");
