@@ -1,23 +1,36 @@
 <?php
-session_start();
 
-require("Base.php");
-
-class class_ControlAcceso extends class_Base
+class class_ControlAcceso
 {
+	protected $mysqli;
+	
+	function __construct() {
+		require('Conexion.php');
+		
+		session_unset();
+		session_destroy();
+		session_start();
+		
+		$_SESSION["LAST_ACTIVITY"] = $_SERVER["REQUEST_TIME"];
+		
+		
+		
+    
+		$aux = new mysqli_driver;
+		$aux->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+		
+		$this->mysqli = new mysqli("$servidor", "$usuario", "$password", "$base");
+		$this->mysqli->query("SET NAMES 'utf8'");
+	}
 
 
   public function method_login($params, $error) {
   	$p = $params[0];
   	
-	//$sql = "SELECT titulos.denominacion AS titulo_descrip, titulos.id_titulo, titulos.codigo AS cod_titulo, tipos_titulos.id_tipo_titulo, tipos_titulos.codigo AS cod_tipo_titulo, tipos_clasificacion.id_tipo_clasificacion, tipos_clasificacion.denominacion AS tipo_clasificacion, tipos_titulos.tipo AS tipo_titulo";
-	//$sql.= " FROM ((tomo_espacios INNER JOIN titulos USING(id_titulo)) INNER JOIN tipos_clasificacion USING(id_tipo_clasificacion)) INNER JOIN tipos_titulos USING(id_tipo_titulo)";
-	//$sql.= " WHERE id_espacio=" . $p->id_espacio . " AND id_carrera=" . $p->id_carrera;
-	
-	//return $this->toJson($sql);
 	
 	
-	
+	//$error->SetError(0, "mantenimiento");
+	//return $error;
 	
 	
 	
@@ -41,6 +54,16 @@ class class_ControlAcceso extends class_Base
 
 	if (empty($SYSsistema_id)) $_mensaje.='No está indicado a que sistema desea conectarse. ';
 	 
+	
+	if (empty($SYSusuario)) {
+		$error->SetError(0, "nick");
+		return $error;
+	}
+	if (empty($SYSpassword)) {
+		$error->SetError(0, "password");
+		return $error;
+	}
+	
 	
 	// Verifico si el suario es válido
 	if (!empty($SYSusuario) AND !empty($SYSpassword)) {
@@ -217,6 +240,8 @@ class class_ControlAcceso extends class_Base
 	if (!empty($_mensaje)) {     
 		$xml.="<error>$_mensaje</error>";
 	} else {
+		
+		$_SESSION["LAST_ACTIVITY"] = $_SERVER["REQUEST_TIME"];
 		
 		$resultado = new stdClass;
 		

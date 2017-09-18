@@ -133,7 +133,7 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 	slbUsuario.setMinWidth(200);
 	slbUsuario.add(new qx.ui.form.ListItem("-", null, "0"));
 	
-	var rpc = new qx.io.remote.Rpc("services/", "comp.ComisionDeTitulos");
+	var rpc = new sical3.comp.rpc.Rpc("services/", "comp.ComisionDeTitulos");
 	try {
 		var resultado = rpc.callSync("autocompletarUsuario", {texto: ""});
 	} catch (ex) {
@@ -155,7 +155,7 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 		
 		var p = {};
 		
-		var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.NovedadesTomoEspacios");
+		var rpc = new sical3.comp.rpc.Rpc("services/", "comp.NovedadesTomoEspacios");
 		rpc.callAsync(function(resultado, error, id) {
 			tableModel.setDataAsMapArray(resultado, true);
 			
@@ -200,7 +200,7 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 	
 	var mnuNivel = new qx.ui.menu.Menu();
 	
-	var rpc = new qx.io.remote.Rpc("services/", "comp.ComisionDeTitulos");
+	var rpc = new sical3.comp.rpc.Rpc("services/", "comp.ComisionDeTitulos");
 	try {
 		var resultado = rpc.callSync("autocompletarNivel", {texto: ""});
 	} catch (ex) {
@@ -328,7 +328,7 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 					var p = {};
 					p.nov_tomo_espacios = nov_tomo_espacios;
 					
-					var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.NovedadesTomoEspacios");
+					var rpc = new sical3.comp.rpc.Rpc("services/", "comp.NovedadesTomoEspacios");
 					rpc.callAsync(function(resultado, error, id) {
 						dialog.Dialog.alert("Las novedades seleccionadas se impactaron con éxito.", function(e){
 							cboTitulo.focus();

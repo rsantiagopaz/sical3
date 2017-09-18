@@ -78,10 +78,13 @@ qx.Class.define("sical3.comp.pageCategorizacionEspaciosTitulos",
 			p.id_espacio = lstEspacioA.getModelSelection().getItem(0);
 			p.id_carrera = lstCarreraA.getModelSelection().getItem(0);
 			
-			var rpc = new qx.io.remote.Rpc("services/", "comp.ComisionDeTitulos");
-			rpc.callAsync(function(resultado, error, id) {
-				tableModelAfin.setDataAsMapArray(resultado, true);
-			}, "leer_titulos", p);
+			var rpc = new sical3.comp.rpc.Rpc("services/", "comp.ComisionDeTitulos");
+			rpc.addListener("completed", function(e){
+				var data = e.getData();
+				
+				tableModelAfin.setDataAsMapArray(data.result, true);
+			});
+			rpc.callAsyncListeners(true, "leer_titulos", p);
 		}
 	}
 	
@@ -93,16 +96,19 @@ qx.Class.define("sical3.comp.pageCategorizacionEspaciosTitulos",
 			p.id_espacio = lstEspacioD.getModelSelection().getItem(0);
 			p.id_carrera = lstCarreraD.getModelSelection().getItem(0);
 			
-			var rpc = new qx.io.remote.Rpc("services/", "comp.ComisionDeTitulos");
-			rpc.callAsync(function(resultado, error, id) {
-				modelDest = resultado.length;
+			var rpc = new sical3.comp.rpc.Rpc("services/", "comp.ComisionDeTitulos");
+			rpc.addListener("completed", function(e){
+				var data = e.getData();
+				
+				modelDest = data.result.length;
 				
 				if (modelDest > 0) {
 					dialog.Dialog.error("El espacio/carrera de destino ya tiene títulos asignados previamente.", function(e){
 						cboEspacioD.focus();
 					});
 				}
-			}, "leer_titulos", p);
+			});
+			rpc.callAsyncListeners(true, "leer_titulos", p);
 		}
 	}
 	
@@ -579,8 +585,8 @@ qx.Class.define("sical3.comp.pageCategorizacionEspaciosTitulos",
 	btnConfirmar.addListener("execute", function(e){
 		var bandera = true;
 		
-		if (modelDest > 0) {
 		//if (false) {
+		if (modelDest > 0) {
 			dialog.Dialog.error("El espacio/carrera de destino ya tiene títulos asignados previamente.", function(e){
 				cboEspacioD.focus();
 			});
@@ -620,9 +626,12 @@ qx.Class.define("sical3.comp.pageCategorizacionEspaciosTitulos",
 						p.titulo = tableModelDest.getDataAsMapArray();
 						
 						//alert(qx.lang.Json.stringify(p, null, 2));
+						//return;
 						
-						var rpc = new qx.io.remote.Rpc("services/", "comp.ComisionDeTitulos");
-						rpc.callAsync(function(resultado, error, id) {
+						var rpc = new sical3.comp.rpc.Rpc("services/", "comp.ComisionDeTitulos");
+						rpc.addListener("completed", function(e){
+							var data = e.getData();
+							
 							lstEspacioA.resetSelection();
 							cboEspacioA.setValue("");
 							lstCarreraA.resetSelection();
@@ -638,7 +647,8 @@ qx.Class.define("sical3.comp.pageCategorizacionEspaciosTitulos",
 							dialog.Dialog.alert("El alta de títulos para el espacio/carrera de destino se ha realizado con éxito.", function(e){
 								cboEspacioA.focus();
 							});
-						}, "guardar_titulos", p);
+						});
+						rpc.callAsyncListeners(true, "guardar_titulos", p);
 					}
 				});
 			} else {

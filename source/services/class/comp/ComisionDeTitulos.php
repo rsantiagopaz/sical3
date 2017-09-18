@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 require("Base.php");
 
@@ -10,20 +9,30 @@ class class_ComisionDeTitulos extends class_Base
   public function method_guardar_titulos($params, $error) {
   	$p = $params[0];
   	
+  	$this->mysqli->query("START TRANSACTION");
+  	
 	foreach ($p->titulo as $row) {
-			$sql = "INSERT tomo_espacios SET";
-			$sql.= "  id_espacio='" . $p->espacio->model . "'";
-			$sql.= ", cod_espacio='" . $p->espacio->codigo . "'";
-			$sql.= ", id_carrera='" . $p->carrera->model . "'";
-			$sql.= ", cod_carrera='" . $p->carrera->codigo . "'";
-			$sql.= ", id_titulo='" . $row->id_titulo . "'";
-			$sql.= ", cod_titulo='" . $row->cod_titulo . "'";
-			$sql.= ", id_tipo_titulo='" . $row->id_tipo_titulo . "'";
-			$sql.= ", cod_tipo_titulo='" . $row->cod_tipo_titulo . "'";
-			$sql.= ", id_tipo_clasificacion='" . $row->id_tipo_clasificacion . "'";
-			
-			$this->mysqli->query($sql);
+		$sql = "INSERT tomo_espacios SET";
+		$sql.= "  id_espacio='" . $p->espacio->model . "'";
+		$sql.= ", cod_espacio='" . $p->espacio->codigo . "'";
+		$sql.= ", id_carrera='" . $p->carrera->model . "'";
+		$sql.= ", cod_carrera='" . $p->carrera->codigo . "'";
+		$sql.= ", id_titulo='" . $row->id_titulo . "'";
+		$sql.= ", cod_titulo='" . $row->cod_titulo . "'";
+		$sql.= ", id_tipo_titulo='" . $row->id_tipo_titulo . "'";
+		$sql.= ", cod_tipo_titulo='" . $row->cod_tipo_titulo . "'";
+		$sql.= ", id_tipo_clasificacion='" . $row->id_tipo_clasificacion . "'";
+		
+		$this->mysqli->query($sql);
+		
+		$insert_id = $this->mysqli->insert_id;
+		
+		$_descrip = "ALTA DE TOMO-ESPACIO CON id='" . $insert_id . "', TITULO '" . $row->titulo_descrip . "', CARRERA '" . $p->carrera->label . "', ESPACIO '" . $p->espacio->label . "'";
+		
+		$this->auditoria($sql, null, null, 'tomo_espacios', $insert_id, $_descrip, '', '');
 	}
+	
+	$this->mysqli->query("COMMIT");
   }
 
 
@@ -40,6 +49,8 @@ class class_ComisionDeTitulos extends class_Base
   
   public function method_leer_tipos_clasificacion($params, $error) {
   	$p = $params[0];
+  	
+  	//return $_SESSION["LAST_ACTIVITY"];
   	
 	$sql = "SELECT tipos_clasificacion.*, denominacion AS descrip FROM tipos_clasificacion ORDER BY descrip";
 	return $this->toJson($sql);
