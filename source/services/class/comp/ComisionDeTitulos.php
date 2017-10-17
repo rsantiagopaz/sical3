@@ -11,46 +11,62 @@ class class_ComisionDeTitulos extends class_Base
   	
   	$this->mysqli->query("START TRANSACTION");
   	
-	foreach ($p->titulo as $row) {
+	foreach ($p->titulo as $titulo) {
 		$sql = "INSERT tomo_espacios SET";
 		$sql.= "  id_espacio='" . $p->espacio->model . "'";
 		$sql.= ", cod_espacio='" . $p->espacio->codigo . "'";
 		$sql.= ", id_carrera='" . $p->carrera->model . "'";
 		$sql.= ", cod_carrera='" . $p->carrera->codigo . "'";
-		$sql.= ", id_titulo='" . $row->id_titulo . "'";
-		$sql.= ", cod_titulo='" . $row->cod_titulo . "'";
-		$sql.= ", id_tipo_titulo='" . $row->id_tipo_titulo . "'";
-		$sql.= ", cod_tipo_titulo='" . $row->cod_tipo_titulo . "'";
-		$sql.= ", id_tipo_clasificacion='" . $row->id_tipo_clasificacion . "'";
+		$sql.= ", id_titulo='" . $titulo->id_titulo . "'";
+		$sql.= ", cod_titulo='" . $titulo->cod_titulo . "'";
+		$sql.= ", id_tipo_titulo='" . $titulo->id_tipo_titulo . "'";
+		$sql.= ", cod_tipo_titulo='" . $titulo->cod_tipo_titulo . "'";
+		$sql.= ", id_tipo_clasificacion='" . $titulo->id_tipo_clasificacion . "'";
 		
 		$this->mysqli->query($sql);
 		
-		$insert_id = $this->mysqli->insert_id;
+		$id_tomo_espacio = $this->mysqli->insert_id;
 		
-		$_descrip = "ALTA DE TOMO-ESPACIO CON id='" . $insert_id . "', TITULO '" . $row->titulo_descrip . "', CARRERA '" . $p->carrera->label . "', ESPACIO '" . $p->espacio->label . "'";
 		
-		$this->auditoria($sql, null, null, 'tomo_espacios', $insert_id, $_descrip, '', '');
+		
+		
+		$_descrip = "ALTA DE TOMO-ESPACIO CON id='" . $id_tomo_espacio . "', TITULO '" . $titulo->titulo_descrip . "', CARRERA '" . $p->carrera->label . "', ESPACIO '" . $p->espacio->label . "'";
+		
+		$this->auditoria($sql, null, null, 'tomo_espacios', $id_tomo_espacio, $_descrip, '', '');
+		
+		
+		
+		$sql = "INSERT nov_tomo_espacios SET";
+		$sql.= "  id_espacio='" . $p->espacio->model . "'";
+		$sql.= ", cod_espacio='" . $p->espacio->codigo . "'";
+		$sql.= ", id_carrera='" . $p->carrera->model . "'";
+		$sql.= ", cod_carrera='" . $p->carrera->codigo . "'";
+		$sql.= ", id_titulo='" . $titulo->id_titulo . "'";
+		$sql.= ", cod_titulo='" . $titulo->cod_titulo . "'";
+		$sql.= ", id_tipo_titulo='" . $titulo->id_tipo_titulo . "'";
+		$sql.= ", cod_tipo_titulo='" . $titulo->cod_tipo_titulo . "'";
+		$sql.= ", id_tipo_clasificacion='" . $titulo->id_tipo_clasificacion . "'";
+		
+		$sql.= ", id_tomo_espacio='" . $id_tomo_espacio . "'";
+		$sql.= ", tipo_novedad='N'";
+		$sql.= ", estado='V'";
+		$sql.= ", fecha_novedad=NOW()";
+		$sql.= ", timestamp=NOW()";
+		$sql.= ", usuario_novedad='" . $_SESSION['usuario'] . "'";
+		
+		$this->mysqli->query($sql);
 	}
 	
 	$this->mysqli->query("COMMIT");
   }
+  
+  
 
 
-  public function method_leer_titulos($params, $error) {
-  	$p = $params[0];
-  	
-	$sql = "SELECT titulos.denominacion AS titulo_descrip, titulos.id_titulo, titulos.codigo AS cod_titulo, tipos_titulos.id_tipo_titulo, tipos_titulos.codigo AS cod_tipo_titulo, tipos_clasificacion.id_tipo_clasificacion, tipos_clasificacion.denominacion AS tipo_clasificacion, tipos_titulos.tipo AS tipo_titulo";
-	$sql.= " FROM ((tomo_espacios INNER JOIN titulos USING(id_titulo)) INNER JOIN tipos_clasificacion USING(id_tipo_clasificacion)) INNER JOIN tipos_titulos USING(id_tipo_titulo)";
-	$sql.= " WHERE id_espacio=" . $p->id_espacio . " AND id_carrera=" . $p->id_carrera;
-	
-	return $this->toJson($sql);
-  }
   
   
   public function method_leer_tipos_clasificacion($params, $error) {
   	$p = $params[0];
-  	
-  	//return $_SESSION["LAST_ACTIVITY"];
   	
 	$sql = "SELECT tipos_clasificacion.*, denominacion AS descrip FROM tipos_clasificacion ORDER BY descrip";
 	return $this->toJson($sql);
@@ -63,6 +79,26 @@ class class_ComisionDeTitulos extends class_Base
 	$sql = "SELECT tipos_titulos.*, tipo AS descrip FROM tipos_titulos ORDER BY descrip";
 	return $this->toJson($sql);
   }
+  
+  
+  public function method_autocompletarCargo($params, $error) {
+  	$p = $params[0];
+  	
+	if (is_numeric($p->texto)) {
+	 	$sql = "SELECT id_cargo AS model, CONCAT(CAST(codigo AS CHAR), ' - ', denominacion) AS label, codigo, denominacion, id_nivel";
+		$sql.= " FROM cargos";
+		$sql.= " WHERE codigo LIKE '" . $p->texto . "%'";
+		$sql.= " ORDER BY codigo, denominacion";
+	} else {
+	 	$sql = "SELECT id_cargo AS model, CONCAT(CAST(codigo AS CHAR), ' - ', denominacion) AS label, codigo, denominacion, id_nivel";
+		$sql.= " FROM cargos";
+		$sql.= " WHERE denominacion LIKE '%" . $p->texto . "%'";
+		$sql.= " ORDER BY denominacion, codigo";
+	}
+	
+	return $this->toJson($sql);
+  }
+  
 
 
   
@@ -143,6 +179,30 @@ class class_ComisionDeTitulos extends class_Base
 		$sql.= " WHERE denominacion LIKE '%" . $p->texto . "%'";
 		$sql.= " ORDER BY denominacion, codigo";
 	}
+	
+	return $this->toJson($sql);
+  }
+  
+  
+  public function method_autocompletarUsuario($params, $error) {
+  	$p = $params[0];
+  	
+ 	$sql = "SELECT SYSusuario AS model, SYSusuarionombre AS label";
+	$sql.= " FROM _usuarios INNER JOIN _organismos_areas_usuarios USING(SYSusuario)";
+	$sql.= " WHERE _organismos_areas_usuarios.organismo_area_id='6' AND SYSusuario LIKE '%" . $p->texto . "%'";
+	$sql.= " ORDER BY label";
+	
+	return $this->toJson($sql);
+  }
+  
+  
+  public function method_autocompletarNivel($params, $error) {
+  	$p = $params[0];
+  	
+ 	$sql = "SELECT id_nivel AS model, nivel AS label";
+	$sql.= " FROM niveles";
+	$sql.= " WHERE nivel LIKE '%" . $p->texto . "%'";
+	$sql.= " ORDER BY label";
 	
 	return $this->toJson($sql);
   }

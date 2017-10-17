@@ -4,7 +4,7 @@
 $servidor = "localhost";
 $usuario = "root";
 $password = "";
-$base = "ramon_prueba_sical";
+$base = "sical";
 
 
 

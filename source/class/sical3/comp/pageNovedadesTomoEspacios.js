@@ -73,33 +73,48 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 	
 	var functionContarSeleccionados = function() {
 		var rowCount = tableModel.getRowCount();
-		var count = 0;
+		var contador = 0;
 		
 		for (var x = 0; x <= rowCount - 1; x++) {
-			if (tableModel.getValueById("seleccionar", x)) count++;
+			if (tableModel.getValueById("seleccionar", x)) contador++;
 		}
 		
-		return count;
+		tbl.setAdditionalStatusBarText(rowCount + ((rowCount == 1) ? " item - " : " items - ") + contador + ((contador == 1) ? " seleccionado" : " seleccionados"));
+		
+		return contador;
 	}
+	
+	
+	
+	
+	var bounds = application.getRoot().getBounds();
+	
+	var imageLoading = new qx.ui.basic.Image("sical3/loading66.gif");
+	imageLoading.setVisibility("hidden");
+	imageLoading.setBackgroundColor("#FFFFFF");
+	imageLoading.setDecorator("main");
+	application.getRoot().add(imageLoading, {left: parseInt(bounds.width / 2 - 33), top: parseInt(bounds.height / 2 - 33)});
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	var gbxTitulo = new qx.ui.groupbox.GroupBox("Filtrar novedades");
 	var layout = new qx.ui.layout.Grid(6, 6);
 	gbxTitulo.setLayout(layout);
-	this.add(gbxTitulo, {left: 0, top: 0, right: "50%"});
+	this.add(gbxTitulo, {left: 0, top: 0, right: "40%"});
 	
 	
 	gbxTitulo.add(new qx.ui.basic.Label("Título:"), {row: 0, column: 0});
 	
 	var cboTitulo = new sical3.comp.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.ComisionDeTitulos", methodName: "autocompletarTitulo"});
 	var lstTitulo = cboTitulo.getChildControl("list");
-	lstTitulo.addListener("changeSelection", function(e){
-		if (lstTitulo.isSelectionEmpty()) {
-
-		} else {
-
-		}
-	}, this);
 	gbxTitulo.add(cboTitulo, {row: 0, column: 1, colSpan: 4});
 	layout.setColumnFlex(4, 1);
 	
@@ -108,21 +123,7 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 	gbxTitulo.add(new qx.ui.basic.Label("Espacio:"), {row: 1, column: 0});
 	
 	var cboEspacio = new sical3.comp.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.ComisionDeTitulos", methodName: "autocompletarEspacio"});
-	//aux = cboEspacioA.getChildControl("popup");
-	//aux.addListener("disappear", functionAfin_disappear);
-	
 	var lstEspacio = cboEspacio.getChildControl("list");
-	lstEspacio.addListener("changeSelection", function(e){
-		var data = e.getData();
-		
-		if (lstEspacio.isSelectionEmpty()) {
-			cboCarreraA.setPhpParametros(null);
-			
-			functionAfin_disappear();
-		} else {
-			cboCarreraA.setPhpParametros({id_espacio: data[0].getModel()});
-		}
-	});
 	gbxTitulo.add(cboEspacio, {row: 1, column: 1, colSpan: 4});
 	
 	
@@ -149,20 +150,36 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 	var btnFiltrar = new qx.ui.form.Button("Filtrar");
 	btnFiltrar.addListener("execute", function(e){
 		btnFiltrar.setEnabled(false);
+		btnImpactar.setEnabled(false);
 		
+		imageLoading.setVisibility("visible");
+		
+		tbl.resetSelection();
 		tbl.setFocusedCell();
 		tableModel.setDataAsMapArray([], true);
 		
 		var p = {};
 		
+		if (! lstTitulo.isSelectionEmpty()) p.id_titulo = lstTitulo.getModelSelection().getItem(0);
+		if (! lstEspacio.isSelectionEmpty()) p.id_espacio = lstEspacio.getModelSelection().getItem(0);
+		if (slbUsuario.indexOf(slbUsuario.getSelection()[0]) > 0) p.usuario = slbUsuario.getModelSelection().getItem(0);
+		
+		//alert(qx.lang.Json.stringify(p, null, 2));
+		
 		var rpc = new sical3.comp.rpc.Rpc("services/", "comp.NovedadesTomoEspacios");
-		rpc.callAsync(function(resultado, error, id) {
-			tableModel.setDataAsMapArray(resultado, true);
+		rpc.addListener("completed", function(e){
+			var data = e.getData();
 			
-			tbl.setAdditionalStatusBarText(tableModel.getRowCount() + " item/s - " + functionContarSeleccionados() + " seleccionados");
+			tableModel.setDataAsMapArray(data.result, true);
+			
+			functionContarSeleccionados();
+			
+			imageLoading.setVisibility("hidden");
 			
 			btnFiltrar.setEnabled(true);
-		}, "leer_espacios", p);
+			btnImpactar.setEnabled(true);
+		});
+		rpc.callAsyncListeners(true, "leer_espacios", p);
 	});
 	gbxTitulo.add(btnFiltrar, {row: 3, column: 1});
 	
@@ -177,7 +194,7 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 				tableModel.setValueById("seleccionar", x, true);
 			}
 		
-			tbl.setAdditionalStatusBarText(rowCount + " item/s - " + rowCount + " seleccionados");		
+			functionContarSeleccionados();
 		}, this, 1);
 	});
 	mnuSeleccionar.add(btnTodos);
@@ -191,7 +208,7 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 				tableModel.setValueById("seleccionar", x, false);
 			}
 		
-			tbl.setAdditionalStatusBarText(rowCount + " item/s - " + 0 + " seleccionados");		
+			functionContarSeleccionados();
 		}, this, 1);
 	});
 	mnuSeleccionar.add(btnNinguno);
@@ -218,7 +235,8 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 				}
 				
 				tableModel.setDataAsMapArray(data, true);
-				tbl.setAdditionalStatusBarText(tableModel.getRowCount() + " item/s - " + functionContarSeleccionados() + " seleccionados");
+				
+				functionContarSeleccionados();
 			}, this, 1);
 		});
 		mnuNivel.add(aux);
@@ -233,6 +251,65 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 	
 	
 
+	
+	
+	
+	
+	
+	
+	
+	//Menu de contexto
+	
+	var commandSeleccionar = new qx.ui.command.Command("Space");
+	commandSeleccionar.setEnabled(false);
+	commandSeleccionar.addListener("execute", function() {
+		var focusedRow = tbl.getFocusedRow();
+			
+		tableModel.setValueById("seleccionar", focusedRow, ! tableModel.getValueById("seleccionar", focusedRow));
+		
+		functionContarSeleccionados();
+	});
+	
+	
+	var menu = new componente.comp.ui.ramon.menu.Menu();
+	var btnSeleccionar = new qx.ui.menu.Button("Seleccionar si/no", null, commandSeleccionar);
+
+	var btnEliminar = new qx.ui.menu.Button("Eliminar...");
+	btnEliminar.setEnabled(false);
+	btnEliminar.addListener("execute", function(e){
+		(new dialog.Confirm({
+			"message"     : "Desea eliminar la novedad?",
+			"callback"    : function(e){
+								if (e) {
+									var rowData = tableModel.getRowDataAsMap(tbl.getFocusedRow());
+									
+									var p = {};
+									p.id_nov_tomo_espacios = rowData.id_nov_tomo_espacios;
+									
+									//alert(qx.lang.Json.stringify(p, null, 2));
+									
+									var rpc = new sical3.comp.rpc.Rpc("services/", "comp.NovedadesTomoEspacios");
+									rpc.addListener("completed", function(e){
+										btnFiltrar.execute();
+									});
+									rpc.addListener("failed", function(e){
+										var data = e.getData();
+										//alert(qx.lang.Json.stringify(data, null, 2));
+										if (data.message == "novedad_existente") dialog.Dialog.error("Ya existe una novedad pendiente de ser impactada para el título, carrera, y espacio seleccionados.");
+									});
+									rpc.callAsyncListeners(true, "eliminar_novedad", p);
+								}
+							},
+			"context"     : this,
+			"image"       : "icon/48/status/dialog-warning.png"
+		})).show();
+	});
+	
+	menu.add(btnSeleccionar);
+	menu.addSeparator();
+	menu.add(btnEliminar);
+	menu.memorizar();
+	
 	
 	
 	
@@ -253,13 +330,9 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 	tbl.setShowCellFocusIndicator(false);
 	tbl.toggleColumnVisibilityButtonVisible();
 	tbl.setRowHeight(45);
+	tbl.setContextMenu(menu);
 	tbl.addListener("cellDbltap", function(e){
-		if (e.getColumn() == 0) {
-			var focusedRow = tbl.getFocusedRow();
-			
-			tableModel.setValueById("seleccionar", focusedRow, ! tableModel.getValueById("seleccionar", focusedRow));
-			tbl.setAdditionalStatusBarText(tableModel.getRowCount() + " item/s - " + functionContarSeleccionados() + " seleccionados");
-		}
+		if (e.getColumn() == 0) commandSeleccionar.execute();
 	});
 	
 	var tableColumnModel = tbl.getTableColumnModel();
@@ -267,15 +340,15 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 	var resizeBehavior = tableColumnModel.getBehavior();
 	resizeBehavior.set(0, {width:"3%", minWidth:100});
 	resizeBehavior.set(1, {width:"5%", minWidth:100});
-	resizeBehavior.set(2, {width:"5%", minWidth:100});
+	resizeBehavior.set(2, {width:"4%", minWidth:100});
 	resizeBehavior.set(3, {width:"21%", minWidth:100});
-	resizeBehavior.set(4, {width:"5%", minWidth:100});
+	resizeBehavior.set(4, {width:"4%", minWidth:100});
 	resizeBehavior.set(5, {width:"21%", minWidth:100});
 	resizeBehavior.set(6, {width:"5%", minWidth:100});
-	resizeBehavior.set(7, {width:"5%", minWidth:100});
+	resizeBehavior.set(7, {width:"4%", minWidth:100});
 	resizeBehavior.set(8, {width:"21%", minWidth:100});
-	resizeBehavior.set(9, {width:"4%", minWidth:100});
-	resizeBehavior.set(10, {width:"5%", minWidth:100});
+	resizeBehavior.set(9, {width:"3%", minWidth:100});
+	resizeBehavior.set(10, {width:"9%", minWidth:100});
 	
 	
 	var cellrendererBoolean = new qx.ui.table.cellrenderer.Boolean();
@@ -301,7 +374,11 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 	var selectionModel = tbl.getSelectionModel();
 	selectionModel.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
 	selectionModel.addListener("changeSelection", function(e){
-		//btnAddUno.setEnabled(! selectionModel.isSelectionEmpty());
+		var selectionEmpty = selectionModel.isSelectionEmpty();
+		
+		commandSeleccionar.setEnabled(! selectionEmpty);
+		btnEliminar.setEnabled(! selectionEmpty);
+		menu.memorizar([commandSeleccionar, btnEliminar]);
 	});
 
 	this.add(tbl, {left: 0, top: 180, right: 0, bottom: 0});
@@ -323,17 +400,31 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 				tbl.focus();
 			});
 		} else {
-			dialog.Dialog.confirm("Desea impactar las las novedades seleccionadas?", function(e){
+			dialog.Dialog.confirm("Desea impactar las novedades seleccionadas?", function(e){
 				if (e) {
+					imageLoading.setVisibility("visible");
+					
 					var p = {};
 					p.nov_tomo_espacios = nov_tomo_espacios;
 					
 					var rpc = new sical3.comp.rpc.Rpc("services/", "comp.NovedadesTomoEspacios");
-					rpc.callAsync(function(resultado, error, id) {
+					rpc.addListener("completed", function(e){
+						var data = e.getData();
+						
+						imageLoading.setVisibility("hidden");
+						
 						dialog.Dialog.alert("Las novedades seleccionadas se impactaron con éxito.", function(e){
+							btnFiltrar.execute();
+							
 							cboTitulo.focus();
 						});
-					}, "impactar", p);
+					});
+					rpc.addListener("failed", function(e){
+						var data = e.getData();
+						
+						alert(qx.lang.Json.stringify(data, null, 2));
+					});
+					rpc.callAsyncListeners(true, "impactar", p);
 				}
 			});
 		}

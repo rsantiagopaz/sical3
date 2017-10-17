@@ -100,7 +100,7 @@ qx.Class.define("sical3.Application",
 		//loginWidget._username.getLayoutParent().getLayout().getCellWidget(0, 1).setValue("danielramirez");
 		//loginWidget._username.getLayoutParent().getLayout().getCellWidget(1, 1).setValue("danielramirez");
 		loginWidget._username.setValue("danielramirez");
-		loginWidget._password.setValue("danielramirez");
+		loginWidget._password.setValue("daniel");
 		
 		
 		loginWidget._password.setInvalidMessage("Contraseña incorrecta");
@@ -192,6 +192,8 @@ qx.Class.define("sical3.Application",
 
 		
 	var pageCategorizacionEspaciosTitulos;
+	var pageIncumbenciaTitulosxCargo;
+	var pageIncumbenciaTitulosxEspacio;
 	var pageNovedadesTomoCargos;
 	var pageNovedadesTomoEspacios;
 	
@@ -233,6 +235,36 @@ qx.Class.define("sical3.Application",
 	
 	var mnuComisionDeTitulos = new qx.ui.menu.Menu();
 	
+	
+	
+	var mnuTitulosEnCargos = new qx.ui.menu.Menu();
+	var btnTitulosEnCargos = new qx.ui.menu.Button("Títulos en Cargos ", null, null, mnuTitulosEnCargos);
+	mnuComisionDeTitulos.add(btnTitulosEnCargos);
+	
+	
+	var btnIncumbenciaTitulosxCargo = new qx.ui.menu.Button("Incumbencia de Títulos para un Cargo...");
+	btnIncumbenciaTitulosxCargo.addListener("execute", function(){
+		if (pageIncumbenciaTitulosxCargo == null) {
+			pageIncumbenciaTitulosxCargo = new sical3.comp.pageIncumbenciaTitulosxCargo();
+			pageIncumbenciaTitulosxCargo.addListenerOnce("close", function(e){
+				pageIncumbenciaTitulosxCargo = null;
+			});
+			tabviewMain.add(pageIncumbenciaTitulosxCargo);
+		}
+		tabviewMain.setSelection([pageIncumbenciaTitulosxCargo]);
+	});
+	mnuTitulosEnCargos.add(btnIncumbenciaTitulosxCargo);
+	
+	
+	
+	
+	
+	
+	
+	var mnuTitulosEnEspacios = new qx.ui.menu.Menu();
+	var btnTitulosEnEspacios = new qx.ui.menu.Button("Títulos en Espacios ", null, null, mnuTitulosEnEspacios);
+	mnuComisionDeTitulos.add(btnTitulosEnEspacios);
+	
 	var btnCategorizacionEspaciosTitulos = new qx.ui.menu.Button("Categorización de Espacios en Títulos...");
 	btnCategorizacionEspaciosTitulos.addListener("execute", function(){
 		if (pageCategorizacionEspaciosTitulos == null) {
@@ -244,11 +276,32 @@ qx.Class.define("sical3.Application",
 		}
 		tabviewMain.setSelection([pageCategorizacionEspaciosTitulos]);
 	});
-	mnuComisionDeTitulos.add(btnCategorizacionEspaciosTitulos);
+	mnuTitulosEnEspacios.add(btnCategorizacionEspaciosTitulos);
 	
 	
 	
-	var btnNovedadesTomoCargos = new qx.ui.menu.Button("Novedades Tomo cargos...");
+	var btnIncumbenciaTitulosxEspacio = new qx.ui.menu.Button("Incumbencia de Títulos para un Espacio...");
+	btnIncumbenciaTitulosxEspacio.addListener("execute", function(){
+		if (pageIncumbenciaTitulosxEspacio == null) {
+			pageIncumbenciaTitulosxEspacio = new sical3.comp.pageIncumbenciaTitulosxEspacio();
+			pageIncumbenciaTitulosxEspacio.addListenerOnce("close", function(e){
+				pageIncumbenciaTitulosxEspacio = null;
+			});
+			tabviewMain.add(pageIncumbenciaTitulosxEspacio);
+		}
+		tabviewMain.setSelection([pageIncumbenciaTitulosxEspacio]);
+	});
+	mnuTitulosEnEspacios.add(btnIncumbenciaTitulosxEspacio);
+	
+	
+	
+	var mnuNovedades = new qx.ui.menu.Menu();
+	var btnNovedades = new qx.ui.menu.Button("Novedades", null, null, mnuNovedades);
+	mnuComisionDeTitulos.add(btnNovedades);
+	
+	
+	
+	var btnNovedadesTomoCargos = new qx.ui.menu.Button("Tomo Cargos...");
 	btnNovedadesTomoCargos.addListener("execute", function(){
 		if (pageNovedadesTomoCargos == null) {
 			pageNovedadesTomoCargos = new sical3.comp.pageNovedadesTomoCargos();
@@ -259,9 +312,9 @@ qx.Class.define("sical3.Application",
 		}
 		tabviewMain.setSelection([pageNovedadesTomoCargos]);
 	});
-	//mnuComisionDeTitulos.add(btnNovedadesTomoCargos);
+	mnuNovedades.add(btnNovedadesTomoCargos);
 	
-	var btnNovedadesTomoEspacios = new qx.ui.menu.Button("Novedades Tomo espacios...");
+	var btnNovedadesTomoEspacios = new qx.ui.menu.Button("Tomo Espacios...");
 	btnNovedadesTomoEspacios.addListener("execute", function(){
 		if (pageNovedadesTomoEspacios == null) {
 			pageNovedadesTomoEspacios = new sical3.comp.pageNovedadesTomoEspacios();
@@ -272,7 +325,13 @@ qx.Class.define("sical3.Application",
 		}
 		tabviewMain.setSelection([pageNovedadesTomoEspacios]);
 	});
-	//mnuComisionDeTitulos.add(btnNovedadesTomoEspacios);
+	mnuNovedades.add(btnNovedadesTomoEspacios);
+	
+	
+	
+	
+	
+
 	
 
 
