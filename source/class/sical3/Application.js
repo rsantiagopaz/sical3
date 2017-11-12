@@ -190,12 +190,21 @@ qx.Class.define("sical3.Application",
 
 	
 
-		
-	var pageCategorizacionEspaciosTitulos;
-	var pageIncumbenciaTitulosxCargo;
-	var pageIncumbenciaTitulosxEspacio;
-	var pageNovedadesTomoCargos;
-	var pageNovedadesTomoEspacios;
+	var tabPages = {};
+	
+	
+	
+	var functionRemover = function() {
+		for (var x in tabPages) {
+			if (tabPages[x] != null) {
+				tabviewMain.remove(tabPages[x]);
+				tabPages[x] = null;
+			}
+			
+		}
+	}
+	
+	
 	
 	
 	var numberformatMontoEs = this.numberformatMontoEs = new qx.util.format.NumberFormat("es");
@@ -244,14 +253,16 @@ qx.Class.define("sical3.Application",
 	
 	var btnIncumbenciaTitulosxCargo = new qx.ui.menu.Button("Incumbencia de Títulos para un Cargo...");
 	btnIncumbenciaTitulosxCargo.addListener("execute", function(){
-		if (pageIncumbenciaTitulosxCargo == null) {
-			pageIncumbenciaTitulosxCargo = new sical3.comp.pageIncumbenciaTitulosxCargo();
-			pageIncumbenciaTitulosxCargo.addListenerOnce("close", function(e){
-				pageIncumbenciaTitulosxCargo = null;
+		if (tabPages["pageIncumbenciaTitulosxCargo"] == null) {
+			functionRemover();
+			
+			tabPages["pageIncumbenciaTitulosxCargo"] = new sical3.comp.pageIncumbenciaTitulosxCargo();
+			tabPages["pageIncumbenciaTitulosxCargo"].addListenerOnce("close", function(e){
+				tabPages["pageIncumbenciaTitulosxCargo"] = null;
 			});
-			tabviewMain.add(pageIncumbenciaTitulosxCargo);
+			tabviewMain.add(tabPages["pageIncumbenciaTitulosxCargo"]);
 		}
-		tabviewMain.setSelection([pageIncumbenciaTitulosxCargo]);
+		tabviewMain.setSelection([tabPages["pageIncumbenciaTitulosxCargo"]]);
 	});
 	mnuTitulosEnCargos.add(btnIncumbenciaTitulosxCargo);
 	
@@ -267,14 +278,15 @@ qx.Class.define("sical3.Application",
 	
 	var btnCategorizacionEspaciosTitulos = new qx.ui.menu.Button("Categorización de Espacios en Títulos...");
 	btnCategorizacionEspaciosTitulos.addListener("execute", function(){
-		if (pageCategorizacionEspaciosTitulos == null) {
-			pageCategorizacionEspaciosTitulos = new sical3.comp.pageCategorizacionEspaciosTitulos();
-			pageCategorizacionEspaciosTitulos.addListenerOnce("close", function(e){
-				pageCategorizacionEspaciosTitulos = null;
+		if (tabPages["pageCategorizacionEspaciosTitulos"] == null) {
+			functionRemover();
+			tabPages["pageCategorizacionEspaciosTitulos"] = new sical3.comp.pageCategorizacionEspaciosTitulos();
+			tabPages["pageCategorizacionEspaciosTitulos"].addListenerOnce("close", function(e){
+				tabPages["pageCategorizacionEspaciosTitulos"] = null;
 			});
-			tabviewMain.add(pageCategorizacionEspaciosTitulos);
+			tabviewMain.add(tabPages["pageCategorizacionEspaciosTitulos"]);
 		}
-		tabviewMain.setSelection([pageCategorizacionEspaciosTitulos]);
+		tabviewMain.setSelection([tabPages["pageCategorizacionEspaciosTitulos"]]);
 	});
 	mnuTitulosEnEspacios.add(btnCategorizacionEspaciosTitulos);
 	
@@ -282,14 +294,16 @@ qx.Class.define("sical3.Application",
 	
 	var btnIncumbenciaTitulosxEspacio = new qx.ui.menu.Button("Incumbencia de Títulos para un Espacio...");
 	btnIncumbenciaTitulosxEspacio.addListener("execute", function(){
-		if (pageIncumbenciaTitulosxEspacio == null) {
-			pageIncumbenciaTitulosxEspacio = new sical3.comp.pageIncumbenciaTitulosxEspacio();
-			pageIncumbenciaTitulosxEspacio.addListenerOnce("close", function(e){
-				pageIncumbenciaTitulosxEspacio = null;
+		if (tabPages["pageIncumbenciaTitulosxEspacio"] == null) {
+			functionRemover();
+			
+			tabPages["pageIncumbenciaTitulosxEspacio"] = new sical3.comp.pageIncumbenciaTitulosxEspacio();
+			tabPages["pageIncumbenciaTitulosxEspacio"].addListenerOnce("close", function(e){
+				tabPages["pageIncumbenciaTitulosxEspacio"] = null;
 			});
-			tabviewMain.add(pageIncumbenciaTitulosxEspacio);
+			tabviewMain.add(tabPages["pageIncumbenciaTitulosxEspacio"]);
 		}
-		tabviewMain.setSelection([pageIncumbenciaTitulosxEspacio]);
+		tabviewMain.setSelection([tabPages["pageIncumbenciaTitulosxEspacio"]]);
 	});
 	mnuTitulosEnEspacios.add(btnIncumbenciaTitulosxEspacio);
 	
@@ -303,27 +317,31 @@ qx.Class.define("sical3.Application",
 	
 	var btnNovedadesTomoCargos = new qx.ui.menu.Button("Tomo Cargos...");
 	btnNovedadesTomoCargos.addListener("execute", function(){
-		if (pageNovedadesTomoCargos == null) {
-			pageNovedadesTomoCargos = new sical3.comp.pageNovedadesTomoCargos();
-			pageNovedadesTomoCargos.addListenerOnce("close", function(e){
-				pageNovedadesTomoCargos = null;
+		if (tabPages["pageNovedadesTomoCargos"] == null) {
+			functionRemover();
+			
+			tabPages["pageNovedadesTomoCargos"] = new sical3.comp.pageNovedadesTomoCargos();
+			tabPages["pageNovedadesTomoCargos"].addListenerOnce("close", function(e){
+				tabPages["pageNovedadesTomoCargos"] = null;
 			});
-			tabviewMain.add(pageNovedadesTomoCargos);
+			tabviewMain.add(tabPages["pageNovedadesTomoCargos"]);
 		}
-		tabviewMain.setSelection([pageNovedadesTomoCargos]);
+		tabviewMain.setSelection([tabPages["pageNovedadesTomoCargos"]]);
 	});
 	mnuNovedades.add(btnNovedadesTomoCargos);
 	
 	var btnNovedadesTomoEspacios = new qx.ui.menu.Button("Tomo Espacios...");
 	btnNovedadesTomoEspacios.addListener("execute", function(){
-		if (pageNovedadesTomoEspacios == null) {
-			pageNovedadesTomoEspacios = new sical3.comp.pageNovedadesTomoEspacios();
-			pageNovedadesTomoEspacios.addListenerOnce("close", function(e){
-				pageNovedadesTomoEspacios = null;
+		if (tabPages["pageNovedadesTomoEspacios"] == null) {
+			functionRemover();
+			
+			tabPages["pageNovedadesTomoEspacios"] = new sical3.comp.pageNovedadesTomoEspacios();
+			tabPages["pageNovedadesTomoEspacios"].addListenerOnce("close", function(e){
+				tabPages["pageNovedadesTomoEspacios"] = null;
 			});
-			tabviewMain.add(pageNovedadesTomoEspacios);
+			tabviewMain.add(tabPages["pageNovedadesTomoEspacios"]);
 		}
-		tabviewMain.setSelection([pageNovedadesTomoEspacios]);
+		tabviewMain.setSelection([tabPages["pageNovedadesTomoEspacios"]]);
 	});
 	mnuNovedades.add(btnNovedadesTomoEspacios);
 	

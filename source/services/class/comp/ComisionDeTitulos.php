@@ -61,8 +61,16 @@ class class_ComisionDeTitulos extends class_Base
   }
   
   
+  public function method_leer_titulos($params, $error) {
+	$p = $params[0];
 
+	$sql = "SELECT id_tomo_espacio, TRIM(titulos.denominacion) AS titulo_descrip, titulos.id_titulo, titulos.codigo AS cod_titulo, tipos_titulos.id_tipo_titulo, tipos_titulos.codigo AS cod_tipo_titulo, tipos_clasificacion.id_tipo_clasificacion, tipos_clasificacion.denominacion AS tipo_clasificacion, tipos_titulos.tipo AS tipo_titulo";
+	$sql.= " FROM ((tomo_espacios INNER JOIN titulos USING(id_titulo)) INNER JOIN tipos_clasificacion USING(id_tipo_clasificacion)) INNER JOIN tipos_titulos USING(id_tipo_titulo)";
+	$sql.= " WHERE id_espacio=" . $p->id_espacio . " AND id_carrera=" . $p->id_carrera;
+	$sql.= " ORDER BY titulo_descrip";
 
+	return $this->toJson($sql);
+  }
   
   
   public function method_leer_tipos_clasificacion($params, $error) {

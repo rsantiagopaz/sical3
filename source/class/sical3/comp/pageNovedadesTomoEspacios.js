@@ -5,11 +5,13 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 	{
 	this.base(arguments);
 
-	this.setLabel('Novedades Tomo espacios');
+	this.setLabel('Novedades Tomo Espacios');
 	this.toggleShowCloseButton();
 	this.setLayout(new qx.ui.layout.Canvas());
 	
 	this.addListenerOnce("appear", function(e){
+		btnFiltrar.execute();
+		
 		cboTitulo.focus();
 	});
 	
@@ -149,8 +151,9 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 	
 	var btnFiltrar = new qx.ui.form.Button("Filtrar");
 	btnFiltrar.addListener("execute", function(e){
-		btnFiltrar.setEnabled(false);
+		gbxTitulo.setEnabled(false);
 		btnImpactar.setEnabled(false);
+		mnbSeleccionar.setEnabled(false);
 		
 		imageLoading.setVisibility("visible");
 		
@@ -176,8 +179,9 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 			
 			imageLoading.setVisibility("hidden");
 			
-			btnFiltrar.setEnabled(true);
+			gbxTitulo.setEnabled(true);
 			btnImpactar.setEnabled(true);
+			mnbSeleccionar.setEnabled(true);
 		});
 		rpc.callAsyncListeners(true, "leer_espacios", p);
 	});
@@ -400,36 +404,51 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 				tbl.focus();
 			});
 		} else {
-			dialog.Dialog.confirm("Desea impactar las novedades seleccionadas?", function(e){
-				if (e) {
-					imageLoading.setVisibility("visible");
-					
-					var p = {};
-					p.nov_tomo_espacios = nov_tomo_espacios;
-					
-					var rpc = new sical3.comp.rpc.Rpc("services/", "comp.NovedadesTomoEspacios");
-					rpc.addListener("completed", function(e){
-						var data = e.getData();
-						
-						imageLoading.setVisibility("hidden");
-						
-						dialog.Dialog.alert("Las novedades seleccionadas se impactaron con éxito.", function(e){
-							btnFiltrar.execute();
-							
-							cboTitulo.focus();
-						});
-					});
-					rpc.addListener("failed", function(e){
-						var data = e.getData();
-						
-						alert(qx.lang.Json.stringify(data, null, 2));
-					});
-					rpc.callAsyncListeners(true, "impactar", p);
-				}
-			});
+			
+			(new dialog.Confirm({
+				"message"     : "Desea impactar las novedades seleccionadas?",
+				"callback"    : function(e){
+									if (e) {
+										imageLoading.setVisibility("visible");
+										
+										gbxTitulo.setEnabled(false);
+										btnImpactar.setEnabled(false);
+										mnbSeleccionar.setEnabled(false);
+										
+										
+										var p = {};
+										p.nov_tomo_espacios = nov_tomo_espacios;
+										
+										var rpc = new sical3.comp.rpc.Rpc("services/", "comp.NovedadesTomoEspacios");
+										rpc.addListener("completed", function(e){
+											var data = e.getData();
+											
+											gbxTitulo.setEnabled(true);
+											btnImpactar.setEnabled(true);
+											mnbSeleccionar.setEnabled(true);
+											
+											imageLoading.setVisibility("hidden");
+											
+											dialog.Dialog.alert("Las novedades seleccionadas se impactaron con éxito.", function(e){
+												btnFiltrar.execute();
+												
+												cboTitulo.focus();
+											});
+										});
+										rpc.addListener("failed", function(e){
+											var data = e.getData();
+											
+											alert(qx.lang.Json.stringify(data, null, 2));
+										});
+										rpc.callAsyncListeners(true, "impactar", p);
+									}
+								},
+				"context"     : this,
+				"image"       : "icon/48/status/dialog-warning.png"
+			})).show();
 		}
 	});
-	this.add(btnImpactar, {left: "70%", top: 60});
+	this.add(btnImpactar, {left: "75%", top: 60});
 	
 	
 		

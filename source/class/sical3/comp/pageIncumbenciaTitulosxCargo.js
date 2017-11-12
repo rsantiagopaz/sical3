@@ -151,7 +151,6 @@ qx.Class.define("sical3.comp.pageIncumbenciaTitulosxCargo",
 									//alert(qx.lang.Json.stringify(p, null, 2));
 									
 									var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaTitulosxCargo");
-									rpc.setTimeout(1000 * 60 * 60);
 									rpc.addListener("completed", function(e){
 										//var data = e.getData();
 										//alert(qx.lang.Json.stringify(data, null, 2));
