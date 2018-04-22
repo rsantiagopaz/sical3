@@ -1,7 +1,7 @@
 qx.Class.define("sical3.comp.windowAcercaDe",
 {
 	extend : componente.comp.ui.ramon.window.Window,
-	construct : function (rowData)
+	construct : function ()
 	{
 	this.base(arguments);
 	

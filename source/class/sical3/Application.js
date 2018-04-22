@@ -245,6 +245,18 @@ qx.Class.define("sical3.Application",
 	var mnuComisionDeTitulos = new qx.ui.menu.Menu();
 	
 	
+	var btnInstituciones = new qx.ui.menu.Button("Instituciones...");
+	btnInstituciones.addListener("execute", function(){
+		var win = new sical3.comp.windowInstituciones();
+		win.setModal(true);
+		
+		doc.add(win);
+		win.center();
+		win.open();
+	});
+	mnuComisionDeTitulos.add(btnInstituciones);
+	
+	
 	
 	var mnuTitulosEnCargos = new qx.ui.menu.Menu();
 	var btnTitulosEnCargos = new qx.ui.menu.Button("Títulos en Cargos ", null, null, mnuTitulosEnCargos);
