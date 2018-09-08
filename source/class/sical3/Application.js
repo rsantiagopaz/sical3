@@ -257,6 +257,42 @@ qx.Class.define("sical3.Application",
 	mnuComisionDeTitulos.add(btnInstituciones);
 	
 	
+	var btnTitulos = new qx.ui.menu.Button("Títulos...");
+	btnTitulos.addListener("execute", function(){
+		var win = new sical3.comp.windowTitulos();
+		win.setModal(true);
+		
+		doc.add(win);
+		win.center();
+		win.open();
+	});
+	mnuComisionDeTitulos.add(btnTitulos);
+	
+	
+	var btnCargos = new qx.ui.menu.Button("Cargos...");
+	btnCargos.addListener("execute", function(){
+		var win = new sical3.comp.windowCargos();
+		win.setModal(true);
+		
+		doc.add(win);
+		win.center();
+		win.open();
+	});
+	mnuComisionDeTitulos.add(btnCargos);
+	
+	
+	var btnEspacios = new qx.ui.menu.Button("Espacios...");
+	btnEspacios.addListener("execute", function(){
+		var win = new sical3.comp.windowEspacios();
+		win.setModal(true);
+		
+		doc.add(win);
+		win.center();
+		win.open();
+	});
+	mnuComisionDeTitulos.add(btnEspacios);
+	
+	
 	
 	var mnuTitulosEnCargos = new qx.ui.menu.Menu();
 	var btnTitulosEnCargos = new qx.ui.menu.Button("Títulos en Cargos ", null, null, mnuTitulosEnCargos);

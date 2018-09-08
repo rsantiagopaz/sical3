@@ -1,4 +1,4 @@
-qx.Class.define("sical3.comp.windowInstituciones",
+qx.Class.define("sical3.comp.windowCargos",
 {
 	extend : componente.comp.ui.ramon.window.Window,
 	construct : function ()
@@ -6,7 +6,7 @@ qx.Class.define("sical3.comp.windowInstituciones",
 		this.base(arguments);
 
 	this.set({
-		caption: "Instituciones",
+		caption: "Cargos",
 		width: 800,
 		height: 500,
 		showMinimize: false,
@@ -24,7 +24,7 @@ qx.Class.define("sical3.comp.windowInstituciones",
 	var application = qx.core.Init.getApplication();
 	
 	
-	var functionActualizar = function(id_institucion) {
+	var functionActualizar = function(id_cargo) {
 		var p = {};
 		
 		var rpc = new sical3.comp.rpc.Rpc("services/", "comp.Parametros");
@@ -35,13 +35,13 @@ qx.Class.define("sical3.comp.windowInstituciones",
 			
 			tableModel.setDataAsMapArray(data.result, true);
 			
-			if (id_institucion != null) {
+			if (id_cargo != null) {
 				tbl.blur();
-				tbl.buscar("id_institucion", id_institucion);
+				tbl.buscar("id_cargo", id_cargo);
 				tbl.focus();
 			}
 		});
-		rpc.callAsyncListeners(true, "autocompletarInstitucion", p);
+		rpc.callAsyncListeners(true, "autocompletarCargo", p);
 		
 		return rpc;
 	};
@@ -51,7 +51,7 @@ qx.Class.define("sical3.comp.windowInstituciones",
 
 	var commandAgregar = new qx.ui.command.Command("Insert");
 	commandAgregar.addListener("execute", function(e){
-		var win = new sical3.comp.windowInstitucion();
+		var win = new sical3.comp.windowCargo();
 		win.addListener("aceptado", function(e){
 			var data = e.getData();
 
@@ -67,7 +67,7 @@ qx.Class.define("sical3.comp.windowInstituciones",
 	commandEditar.addListener("execute", function(e){
 		var rowData = tableModel.getRowData(tbl.getFocusedRow());
 		
-		var win = new sical3.comp.windowInstitucion(rowData);
+		var win = new sical3.comp.windowCargo(rowData);
 		win.addListener("aceptado", function(e){
 			var data = e.getData();
 
@@ -81,7 +81,7 @@ qx.Class.define("sical3.comp.windowInstituciones",
 	
 	
 	var menu = new componente.comp.ui.ramon.menu.Menu();
-	var btnAgregar = new qx.ui.menu.Button("Nueva...", null, commandAgregar);
+	var btnAgregar = new qx.ui.menu.Button("Nuevo...", null, commandAgregar);
 	var btnCambiar = new qx.ui.menu.Button("Modificar...", null, commandEditar);
 	menu.add(btnAgregar);
 	menu.addSeparator();
@@ -94,7 +94,7 @@ qx.Class.define("sical3.comp.windowInstituciones",
 	//Tabla
 
 	var tableModel = new qx.ui.table.model.Filtered();
-	tableModel.setColumns(["Descripción", "Provincia"], ["denominacion", "provincia_descrip"]);
+	tableModel.setColumns(["Código", "Descripción", "Nivel", "Jor.completa", "Subtipo"], ["codigo", "denominacion", "nivel_descrip", "jornada_completa_descrip", "subtipo_descrip"]);
 	
 	tableModel.addListener("dataChanged", function(e){
 		var rowCount = tableModel.getRowCount();
@@ -119,6 +119,10 @@ qx.Class.define("sical3.comp.windowInstituciones",
 	var resizeBehavior = tableColumnModel.getBehavior();
 	//resizeBehavior.set(0, {width:"60%", minWidth:100});
 	//resizeBehavior.set(1, {width:"40%", minWidth:100});
+	
+	var cellrendererNumber = new qx.ui.table.cellrenderer.Number("center");
+	cellrendererNumber.setNumberFormat(application.numberformatEntero);
+	tableColumnModel.setDataCellRenderer(0, cellrendererNumber);
 	
 	var selectionModel = tbl.getSelectionModel();
 	selectionModel.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);

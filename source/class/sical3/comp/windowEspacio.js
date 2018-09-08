@@ -1,4 +1,4 @@
-qx.Class.define("sical3.comp.windowInstitucion",
+qx.Class.define("sical3.comp.windowEspacio",
 {
 	extend : componente.comp.ui.ramon.window.Window,
 	construct : function (rowData)
@@ -6,7 +6,7 @@ qx.Class.define("sical3.comp.windowInstitucion",
 	this.base(arguments);
 	
 	this.set({
-		caption: "Nueva institución",
+		caption: "Nuevo espacio",
 		width: 500,
 		height: 200,
 		showMinimize: false,
@@ -38,24 +38,6 @@ qx.Class.define("sical3.comp.windowInstitucion",
 	form.add(txtDescrip, "Descripción", null, "denominacion");
 	
 	
-	var slbPrestador = new qx.ui.form.SelectBox();
-	slbPrestador.setRequired(true);
-	slbPrestador.setWidth(400);
-	
-	var rpc = new sical3.comp.rpc.Rpc("services/", "comp.Parametros");
-	try {
-		var resultado = rpc.callSync("autocompletarProvincia", {texto: ""});
-	} catch (ex) {
-		alert("Sync exception: " + ex);
-	}
-		
-	for (var x in resultado) {
-		slbPrestador.add(new qx.ui.form.ListItem(resultado[x].label, null, resultado[x].model));
-	}
-	
-	form.add(slbPrestador, "Provincia", null, "id_provincia");
-	
-
 
 
 	
@@ -68,11 +50,11 @@ qx.Class.define("sical3.comp.windowInstitucion",
 	
 	
 	if (rowData == null) {
-		this.setCaption("Nueva institución");
+		this.setCaption("Nuevo espacio");
 		
-		aux = qx.data.marshal.Json.createModel({id_institucion: "0", denominacion: "", id_provincia: "0"}, true);
+		aux = qx.data.marshal.Json.createModel({id_espacio: "0", denominacion: ""}, true);
 	} else {
-		this.setCaption("Modificar institución");
+		this.setCaption("Modificar espacio");
 		
 		//alert(qx.lang.Json.stringify(rowData, null, 2));
 		
@@ -107,11 +89,11 @@ qx.Class.define("sical3.comp.windowInstitucion",
 				
 				if (data.message == "descrip_duplicado") {
 					txtDescrip.focus();
-					txtDescrip.setInvalidMessage("Ya existe una institución con la misma descripción");
+					txtDescrip.setInvalidMessage("Ya existe un espacio con la misma descripción");
 					txtDescrip.setValid(false);
 				}
 			}, this);
-			rpc.callAsyncListeners(true, "alta_modifica_institucion", p);
+			rpc.callAsyncListeners(true, "alta_modifica_espacio", p);
 			
 		} else {
 			form.getValidationManager().getInvalidFormItems()[0].focus();

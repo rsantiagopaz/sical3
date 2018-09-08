@@ -1,4 +1,4 @@
-qx.Class.define("sical3.comp.windowInstituciones",
+qx.Class.define("sical3.comp.windowTitulos",
 {
 	extend : componente.comp.ui.ramon.window.Window,
 	construct : function ()
@@ -6,12 +6,12 @@ qx.Class.define("sical3.comp.windowInstituciones",
 		this.base(arguments);
 
 	this.set({
-		caption: "Instituciones",
+		caption: "Títulos",
 		width: 800,
 		height: 500,
 		showMinimize: false,
-		showMaximize: false,
-		allowMaximize: false,
+		//showMaximize: false,
+		//allowMaximize: false,
 		resizable: false
 	});
 	
@@ -24,7 +24,48 @@ qx.Class.define("sical3.comp.windowInstituciones",
 	var application = qx.core.Init.getApplication();
 	
 	
-	var functionActualizar = function(id_institucion) {
+	/*
+	var defineMultiLineCell = qx.Class.define("multiLineCell",{
+		extend : qx.ui.table.cellrenderer.Html,
+	
+		members : {
+			_getContentHtml : function(cellInfo) {
+				var html = qx.bom.String.escape(cellInfo.value || "");
+
+				return '<div style="display: table-cell; vertical-align: middle; position: relative;">' + html + '</div>';
+			},
+
+			_getCellStyle:function (cellInfo) {
+				return 'white-space: normal; line-height: 1em; display: table;';
+			}
+		}
+	});
+	*/
+	
+	var defineMultiLineCell = qx.Class.define("multiLineCell",{
+		extend : qx.ui.table.cellrenderer.Default,
+	
+		members : {
+			_getContentHtml : function(cellInfo) {
+				var html = qx.bom.String.escape(cellInfo.value || "");
+
+				return '<div style="display: table-cell; vertical-align: middle; position: relative;">' + html + '</div>';
+			}
+		}
+	});
+	
+	var defineMultiLineCellNumber = qx.Class.define("multiLineCellNumber",{
+		extend : qx.ui.table.cellrenderer.Default,
+	
+		members : {
+			_getContentHtml : function(cellInfo) {
+				return String(cellInfo.value);
+			}
+		}
+	});
+	
+	
+	var functionActualizar = function(id_titulo) {
 		var p = {};
 		
 		var rpc = new sical3.comp.rpc.Rpc("services/", "comp.Parametros");
@@ -35,13 +76,13 @@ qx.Class.define("sical3.comp.windowInstituciones",
 			
 			tableModel.setDataAsMapArray(data.result, true);
 			
-			if (id_institucion != null) {
+			if (id_titulo != null) {
 				tbl.blur();
-				tbl.buscar("id_institucion", id_institucion);
+				tbl.buscar("id_titulo", id_titulo);
 				tbl.focus();
 			}
 		});
-		rpc.callAsyncListeners(true, "autocompletarInstitucion", p);
+		rpc.callAsyncListeners(true, "autocompletarTitulo", p);
 		
 		return rpc;
 	};
@@ -51,7 +92,7 @@ qx.Class.define("sical3.comp.windowInstituciones",
 
 	var commandAgregar = new qx.ui.command.Command("Insert");
 	commandAgregar.addListener("execute", function(e){
-		var win = new sical3.comp.windowInstitucion();
+		var win = new sical3.comp.windowTitulo();
 		win.addListener("aceptado", function(e){
 			var data = e.getData();
 
@@ -67,7 +108,7 @@ qx.Class.define("sical3.comp.windowInstituciones",
 	commandEditar.addListener("execute", function(e){
 		var rowData = tableModel.getRowData(tbl.getFocusedRow());
 		
-		var win = new sical3.comp.windowInstitucion(rowData);
+		var win = new sical3.comp.windowTitulo(rowData);
 		win.addListener("aceptado", function(e){
 			var data = e.getData();
 
@@ -81,7 +122,7 @@ qx.Class.define("sical3.comp.windowInstituciones",
 	
 	
 	var menu = new componente.comp.ui.ramon.menu.Menu();
-	var btnAgregar = new qx.ui.menu.Button("Nueva...", null, commandAgregar);
+	var btnAgregar = new qx.ui.menu.Button("Nuevo...", null, commandAgregar);
 	var btnCambiar = new qx.ui.menu.Button("Modificar...", null, commandEditar);
 	menu.add(btnAgregar);
 	menu.addSeparator();
@@ -94,7 +135,7 @@ qx.Class.define("sical3.comp.windowInstituciones",
 	//Tabla
 
 	var tableModel = new qx.ui.table.model.Filtered();
-	tableModel.setColumns(["Descripción", "Provincia"], ["denominacion", "provincia_descrip"]);
+	tableModel.setColumns(["Código", "Descripción", "Inst.que otorga", "Nivel que otorga"], ["codigo", "label", "institucion_descrip", "nivel_otorga_descrip"]);
 	
 	tableModel.addListener("dataChanged", function(e){
 		var rowCount = tableModel.getRowCount();
@@ -109,6 +150,7 @@ qx.Class.define("sical3.comp.windowInstituciones",
 	tbl.setShowCellFocusIndicator(false);
 	tbl.toggleColumnVisibilityButtonVisible();
 	//tbl.toggleStatusBarVisible();
+	tbl.setRowHeight(45);
 	tbl.setContextMenu(menu);
 	
 	tbl.addListener("cellDbltap", function(e){
@@ -117,8 +159,24 @@ qx.Class.define("sical3.comp.windowInstituciones",
 	
 	var tableColumnModel = tbl.getTableColumnModel();
 	var resizeBehavior = tableColumnModel.getBehavior();
-	//resizeBehavior.set(0, {width:"60%", minWidth:100});
-	//resizeBehavior.set(1, {width:"40%", minWidth:100});
+	resizeBehavior.set(0, {width:"8%", minWidth:100});
+	resizeBehavior.set(1, {width:"45%", minWidth:100});
+	resizeBehavior.set(2, {width:"37%", minWidth:100});
+	resizeBehavior.set(3, {width:"10%", minWidth:100});
+	
+
+	
+	var cellrendererNumber = new defineMultiLineCellNumber();
+	cellrendererNumber.setDefaultCellStyle("display: table-cell; vertical-align: middle; text-align: center; position: relative;");
+	tableColumnModel.setDataCellRenderer(0, cellrendererNumber);
+	
+	
+	var cellrenderer = new defineMultiLineCell();
+	//var cellrenderer = new qx.ui.table.cellrenderer.Default();
+	cellrenderer.setDefaultCellStyle("white-space: normal; line-height: 1em; display: table;");
+	tableColumnModel.setDataCellRenderer(1, cellrenderer);
+	tableColumnModel.setDataCellRenderer(2, cellrenderer);
+	tableColumnModel.setDataCellRenderer(3, cellrenderer);
 	
 	var selectionModel = tbl.getSelectionModel();
 	selectionModel.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);

@@ -177,10 +177,12 @@ $_auditoria_query_database = 'SELECT DATABASE() AS mysql_database';
 	foreach($model as $key => $value) {
 		if ($chequear) {
 			if (!is_null($campos[$tabla][$key])) {
-				$set[] = $key . "='" . $value . "'";
+				//$set[] = $key . "='" . $value . "'";
+				$set[] = $key . "=" . ((is_null($value)) ? "NULL" : "'" . $value . "'");
 			}			
 		} else {
-			$set[] = $key . "='" . $value . "'";
+			//$set[] = $key . "='" . $value . "'";
+			$set[] = $key . "=" . ((is_null($value)) ? "NULL" : "'" . $value . "'");
 		}
 	}
 	return implode(", ", $set);
