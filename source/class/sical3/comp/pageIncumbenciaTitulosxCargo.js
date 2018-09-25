@@ -322,7 +322,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaTitulosxCargo",
 	var gbxTitulo = new qx.ui.groupbox.GroupBox("Agregar título");
 	var l = new qx.ui.layout.Grid(6, 6);
 	gbxTitulo.setLayout(l);
-	this.add(gbxTitulo, {left: 0, right: "53%", bottom: 0});
+	this.add(gbxTitulo, {left: "53%", right: 0, bottom: 0});
 
 
 	gbxTitulo.add(new qx.ui.basic.Label("Título:"), {row: 0, column: 0});

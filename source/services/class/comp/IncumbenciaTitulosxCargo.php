@@ -267,7 +267,7 @@ class class_IncumbenciaTitulosxCargo extends class_Base
 		$sql = "SELECT id_tomo_cargo";
 		$sql.= " FROM nov_tomo_cargos";
 		$sql.= " WHERE id_tomo_cargo = " . $titulo->id_tomo_cargo;
-		$sql.= " AND estado = 'S'";
+		$sql.= "  AND estado = 'S'";
 		
 		$rs = $this->mysqli->query($sql);
 		

@@ -4,3 +4,6 @@ fecha primera subida 2017-09-08 03:55
 
 
 en tabla cargos, que significa subtipo "P".
+
+
+por qué en Categorización de Títulos en Cargos table derecha no tiene nivel, que significa, se guarda nivel o no en tomo_cargos o nov_tomo_cargos

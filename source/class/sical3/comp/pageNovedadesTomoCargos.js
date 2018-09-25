@@ -304,7 +304,6 @@ qx.Class.define("sical3.comp.pageNovedadesTomoCargos",
 									rpc.addListener("failed", function(e){
 										var data = e.getData();
 										//alert(qx.lang.Json.stringify(data, null, 2));
-										if (data.message == "novedad_existente") dialog.Dialog.error("Ya existe una novedad pendiente de ser impactada para el título y cargo seleccionados.");
 									});
 									rpc.callAsyncListeners(true, "eliminar_novedad", p);
 								}

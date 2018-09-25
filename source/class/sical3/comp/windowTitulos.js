@@ -67,6 +67,7 @@ qx.Class.define("sical3.comp.windowTitulos",
 	
 	var functionActualizar = function(id_titulo) {
 		var p = {};
+		p.parametros = {tipo: "combobox"};
 		
 		var rpc = new sical3.comp.rpc.Rpc("services/", "comp.Parametros");
 		rpc.addListener("completed", function(e){
@@ -108,16 +109,27 @@ qx.Class.define("sical3.comp.windowTitulos",
 	commandEditar.addListener("execute", function(e){
 		var rowData = tableModel.getRowData(tbl.getFocusedRow());
 		
-		var win = new sical3.comp.windowTitulo(rowData);
-		win.addListener("aceptado", function(e){
+		var p = {};
+		p.id_titulo = rowData.model;
+		
+		var rpc = new sical3.comp.rpc.Rpc("services/", "comp.Parametros");
+		rpc.addListener("completed", function(e){
 			var data = e.getData();
+			
+			//alert(qx.lang.Json.stringify(data, null, 2));
 
-			functionActualizar(data);
+			var win = new sical3.comp.windowTitulo(data.result);
+			win.addListener("aceptado", function(e){
+				var data = e.getData();
+	
+				functionActualizar(data);
+			});
+			win.setModal(true);
+			application.getRoot().add(win);
+			win.center();
+			win.open();
 		});
-		win.setModal(true);
-		application.getRoot().add(win);
-		win.center();
-		win.open();
+		rpc.callAsyncListeners(true, "leerTitulo", p);
 	});
 	
 	

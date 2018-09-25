@@ -89,7 +89,7 @@ qx.Class.define("sical3.comp.pageCategorizacionEspaciosTitulos",
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
 				
-				alert(qx.lang.Json.stringify(data.result, null, 2));
+				//alert(qx.lang.Json.stringify(data.result, null, 2));
 			});
 			rpc.callAsyncListeners(true, "leer_titulos", p);
 		}

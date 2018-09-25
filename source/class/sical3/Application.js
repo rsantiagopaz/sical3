@@ -294,6 +294,52 @@ qx.Class.define("sical3.Application",
 	
 	
 	
+	var mnuEspaciosEnTitulos = new qx.ui.menu.Menu();
+	var btnEspaciosEnTitulos = new qx.ui.menu.Button("Cargos en Títulos ", null, null, mnuEspaciosEnTitulos);
+	mnuComisionDeTitulos.add(btnEspaciosEnTitulos);
+	
+	
+	var btnIncumbenciaEspaciosxTitulo = new qx.ui.menu.Button("Incumbencia de Espacios para un Título...");
+	btnIncumbenciaEspaciosxTitulo.addListener("execute", function(){
+		if (tabPages["pageIncumbenciaEspaciosxTitulo"] == null) {
+			functionRemover();
+			
+			tabPages["pageIncumbenciaEspaciosxTitulo"] = new sical3.comp.pageIncumbenciaEspaciosxTitulo();
+			tabPages["pageIncumbenciaEspaciosxTitulo"].addListenerOnce("close", function(e){
+				tabPages["pageIncumbenciaEspaciosxTitulo"] = null;
+			});
+			tabviewMain.add(tabPages["pageIncumbenciaEspaciosxTitulo"]);
+		}
+		tabviewMain.setSelection([tabPages["pageIncumbenciaEspaciosxTitulo"]]);
+	});
+	mnuEspaciosEnTitulos.add(btnIncumbenciaEspaciosxTitulo);
+	
+	
+
+	var mnuCargosEnTitulos = new qx.ui.menu.Menu();
+	var btnCargosEnTitulos = new qx.ui.menu.Button("Cargos en Títulos ", null, null, mnuCargosEnTitulos);
+	mnuComisionDeTitulos.add(btnCargosEnTitulos);
+	
+	
+	var btnIncumbenciaCargosxTitulo = new qx.ui.menu.Button("Incumbencia de Cargos para un Título...");
+	btnIncumbenciaCargosxTitulo.addListener("execute", function(){
+		if (tabPages["pageIncumbenciaCargosxTitulo"] == null) {
+			functionRemover();
+			
+			tabPages["pageIncumbenciaCargosxTitulo"] = new sical3.comp.pageIncumbenciaCargosxTitulo();
+			tabPages["pageIncumbenciaCargosxTitulo"].addListenerOnce("close", function(e){
+				tabPages["pageIncumbenciaCargosxTitulo"] = null;
+			});
+			tabviewMain.add(tabPages["pageIncumbenciaCargosxTitulo"]);
+		}
+		tabviewMain.setSelection([tabPages["pageIncumbenciaCargosxTitulo"]]);
+	});
+	mnuCargosEnTitulos.add(btnIncumbenciaCargosxTitulo);
+	
+	
+	
+	
+	
 	var mnuTitulosEnCargos = new qx.ui.menu.Menu();
 	var btnTitulosEnCargos = new qx.ui.menu.Button("Títulos en Cargos ", null, null, mnuTitulosEnCargos);
 	mnuComisionDeTitulos.add(btnTitulosEnCargos);

@@ -93,13 +93,13 @@ class class_ComisionDeTitulos extends class_Base
   	$p = $params[0];
   	
 	if (is_numeric($p->texto)) {
-	 	$sql = "SELECT id_cargo AS model, CONCAT(CAST(codigo AS CHAR), ' - ', denominacion) AS label, codigo, denominacion, id_nivel";
-		$sql.= " FROM cargos";
+	 	$sql = "SELECT id_cargo AS model, CONCAT(CAST(codigo AS CHAR), ' - ', denominacion) AS label, codigo, denominacion, niveles.*";
+		$sql.= " FROM cargos INNER JOIN niveles USING(id_nivel)";
 		$sql.= " WHERE codigo LIKE '" . $p->texto . "%'";
 		$sql.= " ORDER BY codigo, denominacion";
 	} else {
-	 	$sql = "SELECT id_cargo AS model, CONCAT(CAST(codigo AS CHAR), ' - ', denominacion) AS label, codigo, denominacion, id_nivel";
-		$sql.= " FROM cargos";
+	 	$sql = "SELECT id_cargo AS model, CONCAT(CAST(codigo AS CHAR), ' - ', denominacion) AS label, codigo, denominacion, niveles.*";
+		$sql.= " FROM cargos INNER JOIN niveles USING(id_nivel)";
 		$sql.= " WHERE denominacion LIKE '%" . $p->texto . "%'";
 		$sql.= " ORDER BY denominacion, codigo";
 	}

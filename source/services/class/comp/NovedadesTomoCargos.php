@@ -129,7 +129,7 @@ class class_NovedadesTomoCargos extends class_Base
 	if ($row->estado == "S") {
 		$this->mysqli->query("START TRANSACTION");
 		
-		$sql = "UPDATE tomo_cargos SET marcado='0' WHERE id_tomo_cargo=" . $row->id_tomo_cargo;
+		$sql = "UPDATE tomo_cargos SET marcado='0' WHERE id_tomo_cargo='" . $row->id_tomo_cargo . "'";
 		$this->mysqli->query($sql);
 		
 		$sql = "DELETE FROM nov_tomo_cargos WHERE id_nov_tomo_cargos=" . $p->id_nov_tomo_cargos;

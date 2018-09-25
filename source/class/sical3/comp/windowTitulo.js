@@ -40,7 +40,7 @@ qx.Class.define("sical3.comp.windowTitulo",
 	
 	var slbGrado_titulo = new qx.ui.form.SelectBox();
 	
-	var rpc = new sical3.comp.rpc.Rpc("services/", "comp.Parametros");
+	var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Parametros");
 	try {
 		var resultado = rpc.callSync("autocompletarGrados_titulos", {texto: ""});
 	} catch (ex) {
@@ -56,15 +56,14 @@ qx.Class.define("sical3.comp.windowTitulo",
 	
 	
 	var cboId_institucion = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Parametros", methodName: "autocompletarInstitucion"}, {tipo: "combobox"});
-	//cboDependencia.setRequired(true);
-	form.add(cboId_institucion, "Inst.que otorga", null, "cboDependencia", null, {tabIndex: 1, item: {row: 2, column: 1, colSpan: 10}});
+	form.add(cboId_institucion, "Inst.que otorga", null, "cboId_institucion", null, {tabIndex: 1, item: {row: 2, column: 1, colSpan: 10}});
 	var lstId_institucion = cboId_institucion.getChildControl("list");
 	form.add(lstId_institucion, "", null, "id_institucion");
 	
 	
 	var slbNivel_otorga = new qx.ui.form.SelectBox();
 	
-	var rpc = new sical3.comp.rpc.Rpc("services/", "comp.Parametros");
+	var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Parametros");
 	try {
 		var resultado = rpc.callSync("autocompletarNivel_otorga", {texto: ""});
 	} catch (ex) {
@@ -129,9 +128,9 @@ qx.Class.define("sical3.comp.windowTitulo",
 	
 	var slbNivel = new qx.ui.form.SelectBox();
 	
-	var rpc = new sical3.comp.rpc.Rpc("services/", "comp.Parametros");
+	var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Parametros");
 	try {
-		var resultado = rpc.callSync("autocompletarNivel_otorga", {texto: ""});
+		var resultado = rpc.callSync("autocompletarNivel_para", {texto: ""});
 	} catch (ex) {
 		alert("Sync exception: " + ex);
 	}
@@ -144,6 +143,25 @@ qx.Class.define("sical3.comp.windowTitulo",
 	
 
 	var btnAgregar = new qx.ui.form.Button("Agregar");
+	btnAgregar.addListener("execute", function(e){
+		var bandera = true;
+		var selection = slbNivel.getSelection()[0];
+		var children = list.getChildren();
+		
+		for (var x in children) {
+			if (children[x].getModel() == selection.getModel()) {
+				list.setSelection([children[x]]);
+				bandera = false;
+				break;
+			}
+		}
+		
+		if (bandera) {
+			var item = new qx.ui.form.ListItem(selection.getLabel(), null, selection.getModel());
+			list.add(item);
+			list.setSelection([item]);
+		}
+	});
 	gbx.add(btnAgregar, {left: 0, top: 30});
 	
 	
@@ -155,20 +173,7 @@ qx.Class.define("sical3.comp.windowTitulo",
 	var btnEliminar = new qx.ui.menu.Button("Eliminar");
 	btnEliminar.setEnabled(false);
 	btnEliminar.addListener("execute", function(e){
-		dialog.Dialog.confirm("Desea eliminar el mensaje seleccionado?", function(e){
-			if (e) {
-				var p = {id_mensaje: list.getModelSelection().getItem(0).get("id_mensaje")};
-
-				var rpc = new qx.io.remote.Rpc(application.conexion.rpc_elpintao_services, "componente.elpintao.ramon.Productos");
-				try {
-					var resultado = rpc.callSync("eliminar_mensaje", p);
-				} catch (ex) {
-					alert("Sync exception: " + ex);
-				}
-				
-				store.reload();
-			}
-		});
+		list.remove(list.getSelection()[0]);
 	});
 	menu.add(btnEliminar);
 	menu.memorizar();
@@ -181,9 +186,9 @@ qx.Class.define("sical3.comp.windowTitulo",
   list.setContextMenu(menu);
   list.addListener("changeSelection", function(e){
   	var bool = !list.isSelectionEmpty();
-  	//commandVerMensaje.setEnabled(bool);
-  	//menu.memorizar([commandVerMensaje]);
-  	menu.memorizarEnabled([btnEliminar], bool);
+  	btnEliminar.setEnabled(bool);
+  	menu.memorizar([btnEliminar]);
+  	//menu.memorizarEnabled([btnEliminar], bool);
   });
   gbx.add(list, {left: 150, top: 0});
 
@@ -201,13 +206,27 @@ qx.Class.define("sical3.comp.windowTitulo",
 	if (rowData == null) {
 		this.setCaption("Nuevo título");
 		
-		aux = qx.data.marshal.Json.createModel({id_titulo: "0", denominacion: "", id_nivel: "0", jornada_completa: false, subtipo: null}, true);
+		aux = qx.data.marshal.Json.createModel({id_titulo: "0", denominacion: "", id_grado_titulo: null, cboId_institucion: null, id_institucion: null, id_nivel_otorga: null, disciplina_unica: false, norma_creacion: "", modalidad_cursado: null, especifico: null, requisitos_ingreso: "", anios_duracion: 0, carga_horaria: 0}, true);
 	} else {
 		this.setCaption("Modificar título");
 		
 		//alert(qx.lang.Json.stringify(rowData, null, 2));
 		
-		aux = qx.data.marshal.Json.createModel(rowData, true);
+		var listItem;
+		
+		if (rowData.cboId_institucion) {
+			listItem = new qx.ui.form.ListItem(rowData.cboId_institucion.label, null, rowData.cboId_institucion.model);
+			listItem.setUserData("datos", rowData.cboId_institucion);
+			cboId_institucion.add(listItem);
+		}
+		rowData.titulo.cboId_institucion = "";
+		
+		for (var x in rowData.nivel_para) {
+			listItem = new qx.ui.form.ListItem(rowData.nivel_para[x].label, null, rowData.nivel_para[x].model);
+			list.add(listItem);
+		}
+		
+		aux = qx.data.marshal.Json.createModel(rowData.titulo, true);
 	}
 	
 	controllerForm.setModel(aux);
@@ -228,9 +247,11 @@ qx.Class.define("sical3.comp.windowTitulo",
 			var p = {};
 			p.model = qx.util.Serializer.toNativeObject(controllerForm.getModel());
 			
-			if (p.model.id_nivel != "2") p.model.jornada_completa = false;
-			if (p.model.id_nivel != "5") p.model.subtipo = null;
-
+			p.nivel_para = [];
+			var children = list.getChildren();
+			for (var x in children) {
+				p.nivel_para.push(children[x].getModel());
+			}
 			
 			//alert(qx.lang.Json.stringify(p, null, 2));
 			

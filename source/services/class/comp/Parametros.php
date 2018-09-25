@@ -6,6 +6,67 @@ class class_Parametros extends class_Base
 {
 	
 	
+  public function method_alta_modifica_titulo($params, $error) {
+  	$p = $params[0];
+  	
+  	$id_titulo = $p->model->id_titulo;
+	
+	$sql = "SELECT id_titulo FROM titulos WHERE denominacion LIKE '" . $p->model->denominacion . "' AND id_titulo <> '" . $id_titulo . "'";
+	$rs = $this->mysqli->query($sql);
+	if ($rs->num_rows > 0) {
+		$row = $rs->fetch_object();
+		
+		$error->SetError((int) $row->id_titulo, "descrip_duplicado");
+		return $error;
+	}
+
+		
+	$this->mysqli->query("START TRANSACTION");
+		
+	if ($id_titulo == "0") {
+		
+		$sql = "SELECT MAX(codigo) AS maxcodigo FROM titulos";
+		$rs = $this->mysqli->query($sql);
+		$row = $rs->fetch_object();
+		$p->model->codigo = $row->maxcodigo + 1;
+		
+		$set = $this->prepararCampos($p->model, "titulos");
+		
+		$sql = "INSERT titulos SET " . $set;
+		$this->mysqli->query($sql);
+		
+		$id_titulo = $this->mysqli->insert_id;
+		
+		$_descrip = "ALTA DEL TÍTULO '" . $p->model->denominacion . "' CON id='" . $id_titulo . "'";
+		
+		$this->auditoria($sql, null, null, 'titulos', $id_titulo, $_descrip, '', '');
+	} else {
+		
+		$set = $this->prepararCampos($p->model, "titulos");
+		
+		$sql = "UPDATE titulos SET " . $set . " WHERE id_titulo=" . $id_titulo;
+		$this->mysqli->query($sql);
+		
+		$_descrip = "MODIFICACIÓN DEL TÍTULO '" . $p->model->denominacion . "' CON id='" . $id_titulo . "' ";
+		
+		$this->auditoria($sql, null, null, 'titulos', $id_titulo, $_descrip, '', '');
+	}
+	
+	$sql = "DELETE FROM titulos_nivel_para WHERE id_titulo=" . $id_titulo;
+	$this->mysqli->query($sql);
+	
+	foreach ($p->nivel_para as $item) {
+		$sql = "INSERT titulos_nivel_para SET id_titulo=" . $id_titulo . ", id_nivel_para=" . $item;
+		$this->mysqli->query($sql);		
+	}
+
+	
+	$this->mysqli->query("COMMIT");
+	
+	return $id_titulo;
+  }
+	
+	
   public function method_alta_modifica_institucion($params, $error) {
   	$p = $params[0];
   	
@@ -156,13 +217,49 @@ class class_Parametros extends class_Base
   }
   
   
+  public function method_leerTitulo($params, $error) {
+	$p = $params[0];
+	
+	$resultado = new stdClass;
+	
+	$opciones = new stdClass;
+	$opciones->anios_duracion = "int";	
+	$opciones->carga_horaria = "int";
+	$opciones->disciplina_unica = "bool";
+	
+	$sql = "SELECT *";
+	$sql.= " FROM titulos";		
+	$sql.= " WHERE id_titulo=" . $p->id_titulo;
+	$resultado->titulo = $this->toJson($sql, $opciones);
+	$resultado->titulo = $resultado->titulo[0];
+	
+	
+	$sql = "SELECT instituciones.id_institucion AS model, CONCAT(instituciones.denominacion, ' (', provincias.denominacion, ')') AS label, instituciones.*";
+	$sql.= " FROM instituciones INNER JOIN provincias USING(id_provincia)";		
+	$sql.= " WHERE instituciones.id_institucion=" . $resultado->titulo->id_institucion;
+	$rs = $this->mysqli->query($sql);
+	if ($rs->num_rows > 0) {
+		$row = $rs->fetch_object();
+	
+		$resultado->cboId_institucion = $row;		
+	}
+	
+	
+	$sql = "SELECT nivel_para.id_nivel_para AS model, nivel_para.descripcion AS label FROM titulos_nivel_para INNER JOIN nivel_para USING(id_nivel_para) WHERE titulos_nivel_para.id_titulo=" . $p->id_titulo;
+	$resultado->nivel_para = $this->toJson($sql);
+	
+	
+	return $resultado;
+  }
+  
+  
   public function method_autocompletarTitulo($params, $error) {
 	$p = $params[0];
 	
 	$opciones = new stdClass;
 	$opciones->codigo = "int";
 
-	$sql = "SELECT titulos.id_titulo AS model, titulos.denominacion AS label, titulos.codigo, CONCAT(instituciones.denominacion, ' (', provincias.denominacion, ')') AS institucion_descrip, nivel_otorga.descripcion AS nivel_otorga_descrip";
+	$sql = "SELECT titulos.id_titulo, titulos.id_titulo AS model, titulos.denominacion AS label, titulos.codigo, CONCAT(instituciones.denominacion, ' (', provincias.denominacion, ')') AS institucion_descrip, nivel_otorga.descripcion AS nivel_otorga_descrip";
 	$sql.= " FROM titulos LEFT JOIN instituciones USING(id_institucion) LEFT JOIN provincias USING(id_provincia) LEFT JOIN nivel_otorga USING(id_nivel_otorga)";		
 	$sql.= " WHERE titulos.denominacion LIKE '%" . $p->texto . "%'";
 	$sql.= " ORDER BY label";
@@ -261,6 +358,14 @@ class class_Parametros extends class_Base
   	$p = $params[0];
 
   	$sql = "SELECT id_nivel_otorga AS model, descripcion AS label, nivel_otorga.* FROM nivel_otorga WHERE descripcion LIKE '%" . $p->texto . "%' ORDER BY label";
+	return $this->toJson($sql);
+  }
+  
+  
+  public function method_autocompletarNivel_para($params, $error) {
+  	$p = $params[0];
+
+  	$sql = "SELECT id_nivel_para AS model, descripcion AS label, nivel_para.* FROM nivel_para WHERE descripcion LIKE '%" . $p->texto . "%' ORDER BY label";
 	return $this->toJson($sql);
   }
 }
