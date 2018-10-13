@@ -1,4 +1,4 @@
-qx.Class.define("sical3.comp.windowTituloAfin",
+qx.Class.define("sical3.comp.windowCargosxTituloAfin",
 {
 	extend : componente.comp.ui.ramon.window.Window,
 	construct : function ()

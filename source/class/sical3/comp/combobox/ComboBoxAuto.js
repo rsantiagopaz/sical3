@@ -58,6 +58,7 @@ qx.Class.define("sical3.comp.combobox.ComboBoxAuto",
 					
 					this.rpc = new sical3.comp.rpc.Rpc(rpcParametros.url, rpcParametros.serviceName);
 					this.rpc.setTimeout(60000 * 1);
+					this.rpc.mostrar = false;
 					this.rpc.addListener("completed", qx.lang.Function.bind(function(e){
 						var resultado = e.getData().result;
 

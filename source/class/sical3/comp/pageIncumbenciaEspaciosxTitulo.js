@@ -73,7 +73,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 
 
 	
-	var functionDest_disappear = function(e, id_tomo_cargo){
+	var functionDest_disappear = function(e, id_tomo_espacio){
 		
 		tblDest.resetSelection();
 		tblDest.setFocusedCell();
@@ -86,7 +86,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 			var p = {};
 			p.id_titulo = lstTituloD.getModelSelection().getItem(0);
 			
-			var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaCargosxTitulo");
+			var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaEspaciosxTitulo");
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
 				
@@ -96,25 +96,26 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 				lengthDest = data.result.length;
 				functionSeleccion();
 				
-				if (id_tomo_cargo != null) tblDest.buscar("id_tomo_cargo", id_tomo_cargo);
+				if (id_tomo_espacio != null) tblDest.buscar("id_tomo_espacio", id_tomo_espacio);
 			});
-			rpc.callAsyncListeners(true, "leer_cargos", p);
+			rpc.callAsyncListeners(true, "leer_espacios", p);
 		}
 	}
+	
 	
 	
 	var functionSeleccion = function() {
 		if (lengthDest == null) {
 			gbxAfin.setEnabled(false);
-			gbxCargo.setEnabled(false);
+			gbxAgregar.setEnabled(false);
 		} else if (lengthDest == 0) {
 			gbxAfin.setEnabled(true);
-			gbxCargo.setEnabled(true);
+			gbxAgregar.setEnabled(true);
 			
 			dialog.Dialog.warning("Atención<br/><br/>Luego de editar las incumbencias respectivas debe Confirmar los cambios realizados.");
 		} else {
 			gbxAfin.setEnabled(false);
-			gbxCargo.setEnabled(true);
+			gbxAgregar.setEnabled(true);
 		}
 	}
 	
@@ -126,7 +127,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 		
 		var data = tableModelDest.getDataAsMapArray();
 		for (var x = 0; x <= data.length - 1; x++) {
-			if (data[x].id_cargo == rowData.id_cargo) {
+			if (data[x].id_carrera == rowData.id_carrera && data[x].id_espacio == rowData.id_espacio) {
 				focusedRow = x;
 				bandera = false;
 				break;
@@ -244,7 +245,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 	
 	
 	var tableModelDest = new qx.ui.table.model.Simple();
-	tableModelDest.setColumns(["Cargo", "Nivel", "Tipo cla.", "Tipo tit."], ["cargo_descrip", "nivel", "tipo_clasificacion", "id_tipo_titulo"]);
+	tableModelDest.setColumns(["Carrera", "Espacio", "Tipo cla.", "Tipo tit."], ["carrera_descrip", "espacio_descrip", "tipo_clasificacion", "id_tipo_titulo"]);
 	tableModelDest.setColumnEditable(3, true);
 	tableModelDest.addListener("dataChanged", function(e){
 		var rowCount = tableModelDest.getRowCount();
@@ -297,7 +298,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 						rpc.callAsyncListeners(true, "escribir_novedad_modificacion", p);
 						
 					} else if (data.result.message == "UPDATE") {
-						p.id_nov_tomo_cargos = data.result.id_nov_tomo_cargos;
+						p.id_nov_tomo_espacios = data.result.id_nov_tomo_espacios;
 						
 						(new dialog.Confirm({
 							"message"     : "Ya existe modificación previa pendiente de ser impactada. Desea continuar con la nueva modificación?",
@@ -333,8 +334,8 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 	var tableColumnModelDest = tblDest.getTableColumnModel();
 	
 	var resizeBehavior = tableColumnModelDest.getBehavior();
-	resizeBehavior.set(0, {width:"50%", minWidth:100});
-	resizeBehavior.set(1, {width:"20%", minWidth:100});
+	resizeBehavior.set(0, {width:"35%", minWidth:100});
+	resizeBehavior.set(1, {width:"35%", minWidth:100});
 	resizeBehavior.set(2, {width:"15%", minWidth:100});
 	resizeBehavior.set(3, {width:"15%", minWidth:100});
 	
@@ -393,9 +394,9 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 	gbxAfin.setEnabled(false);
 	this.add(gbxAfin, {left: 0, right: "80%", bottom: 0});
 	
-	var btnAgregarAfin = new qx.ui.form.Button("Agregar cargos desde título afín...");
+	var btnAgregarAfin = new qx.ui.form.Button("Agregar espacios desde título afín...");
 	btnAgregarAfin.addListener("execute", function(e){
-		var win = new sical3.comp.windowTituloAfin();
+		var win = new sical3.comp.windowEspaciosxTituloAfin();
 		win.setModal(true);
 		win.addListener("aceptado", function(e){
 			var data = e.getData();
@@ -462,56 +463,82 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 
 
 	var layout = new qx.ui.layout.Grid(6, 6);
-	var gbxCargo = new qx.ui.groupbox.GroupBox("Agregar cargo");
-	gbxCargo.setLayout(layout);
-	gbxCargo.setEnabled(false);
-	this.add(gbxCargo, {left: "53%", right: 0, bottom: 0});
+	var gbxAgregar = new qx.ui.groupbox.GroupBox("Agregar espacio");
+	gbxAgregar.setLayout(layout);
+	gbxAgregar.setEnabled(false);
+	this.add(gbxAgregar, {left: "53%", right: 0, bottom: 0});
 
-
-	gbxCargo.add(new qx.ui.basic.Label("Cargo:"), {row: 0, column: 0});
 	
-	var cboCargo = new sical3.comp.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.ComisionDeTitulos", methodName: "autocompletarCargo"});
-	var lstCargo = cboCargo.getChildControl("list");
-	lstCargo.addListener("changeSelection", function(e){
-		if (lstCargo.isSelectionEmpty()) {
-
+	
+	gbxAgregar.add(new qx.ui.basic.Label("Espacio:"), {row: 0, column: 0});
+	
+	var cboEspacio = new sical3.comp.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.ComisionDeTitulos", methodName: "autocompletarEspacio"});
+	cboEspacio.setRequired(true);
+	var lstEspacio = cboEspacio.getChildControl("list");
+	lstEspacio.addListener("changeSelection", function(e){
+		var data = e.getData();
+		
+		if (lstEspacio.isSelectionEmpty()) {
+			cboCarrera.setPhpParametros(null);
 		} else {
-
+			cboCarrera.setPhpParametros({id_espacio: data[0].getModel()});
 		}
-	}, this);
-	gbxCargo.add(cboCargo, {row: 0, column: 1, colSpan: 4});
+	});
+	gbxAgregar.add(cboEspacio, {row: 0, column: 1, colSpan: 4});
 	layout.setColumnFlex(1, 1);
 	
 	
+	gbxAgregar.add(new qx.ui.basic.Label("Carrera:"), {row: 1, column: 0});
+	
+	var cboCarrera = new sical3.comp.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.ComisionDeTitulos", methodName: "autocompletarCarrera"});
+	cboCarrera.setRequired(true);
+	var lstCarrera = cboCarrera.getChildControl("list");
+	lstCarrera.addListener("changeSelection", function(e){
+		var data = e.getData();
+		
+		if (lstCarrera.isSelectionEmpty()) {
+			cboEspacio.setPhpParametros(null);
+		} else {
+			cboEspacio.setPhpParametros({id_carrera: data[0].getModel()});
+		}
+	});
+	gbxAgregar.add(cboCarrera, {row: 1, column: 1, colSpan: 4});
 	
 	
-	gbxCargo.add(new qx.ui.basic.Label("Tipo clasificación:"), {row: 1, column: 0});
+	
+	
+	
+	
+	
+	gbxAgregar.add(new qx.ui.basic.Label("Tipo clasificación:"), {row: 2, column: 0});
 	
 	var slbTipo_clasificacion = new qx.ui.form.SelectBox();
 	for (var x in application.tipo_clasificacion) {
 		//var item = new qx.ui.form.ListItem(application.tipo_clasificacion[x].denominacion, null, application.tipo_clasificacion[x]);
 		slbTipo_clasificacion.add(new qx.ui.form.ListItem(application.tipo_clasificacion[x].descrip, null, application.tipo_clasificacion[x]));
 	}
-	gbxCargo.add(slbTipo_clasificacion, {row: 1, column: 1});
+	gbxAgregar.add(slbTipo_clasificacion, {row: 2, column: 1});
 	layout.setColumnFlex(1, 1);
 	
 	
 	
-	gbxCargo.add(new qx.ui.basic.Label("Tipo título:"), {row: 1, column: 2});
+	gbxAgregar.add(new qx.ui.basic.Label("Tipo título:"), {row: 2, column: 2});
 	
 	var slbTipo_titulo = new qx.ui.form.SelectBox();
 	for (var x in application.tipo_titulo) {
 		//var item = new qx.ui.form.ListItem(application.tipo_clasificacion[x].denominacion, null, application.tipo_clasificacion[x]);
 		slbTipo_titulo.add(new qx.ui.form.ListItem(application.tipo_titulo[x].descrip, null, application.tipo_titulo[x]));
 	}
-	gbxCargo.add(slbTipo_titulo, {row: 1, column: 3});
+	gbxAgregar.add(slbTipo_titulo, {row: 2, column: 3});
 	layout.setColumnFlex(3, 1);
 	
 	
 	var btnAgregar = new qx.ui.form.Button("Agregar");
 	btnAgregar.addListener("execute", function(e){
-		if (lstCargo.isSelectionEmpty()) {
-			cboCargo.focus();
+		if (lstEspacio.isSelectionEmpty()) {
+			cboEspacio.focus();
+		} else if (lstCarrera.isSelectionEmpty()) {
+			cboCarrera.focus();
 		} else {
 			
 			var datos = lstCargo.getSelection()[0].getUserData("datos");
@@ -556,8 +583,8 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 					rpc.addListener("completed", function(e){
 						var data = e.getData();
 						
-						if (data.result.id_tomo_cargo != null) {
-							functionDest_disappear(null, data.result.id_tomo_cargo);
+						if (data.result.id_tomo_espacio != null) {
+							functionDest_disappear(null, data.result.id_tomo_espacio);
 							
 							dialog.Dialog.alert("El alta se registro con éxito.", function(e){cboCargo.focus();});
 						} else {
@@ -588,7 +615,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 			}
 		}
 	})
-	gbxCargo.add(btnAgregar, {row: 2, column: 4});
+	gbxAgregar.add(btnAgregar, {row: 2, column: 4});
 	
 	
 	
@@ -598,10 +625,11 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 	
 	cboTituloD.setTabIndex(1);
 	tblDest.setTabIndex(3);
-	cboCargo.setTabIndex(4);
-	slbTipo_clasificacion.setTabIndex(5);
-	slbTipo_titulo.setTabIndex(6);
-	btnAgregar.setTabIndex(7);
+	cboEspacio.setTabIndex(4);
+	cboCarrera.setTabIndex(5);
+	slbTipo_clasificacion.setTabIndex(6);
+	slbTipo_titulo.setTabIndex(7);
+	btnAgregar.setTabIndex(8);
 	
 		
 	},

@@ -295,7 +295,7 @@ qx.Class.define("sical3.Application",
 	
 	
 	var mnuEspaciosEnTitulos = new qx.ui.menu.Menu();
-	var btnEspaciosEnTitulos = new qx.ui.menu.Button("Cargos en Títulos ", null, null, mnuEspaciosEnTitulos);
+	var btnEspaciosEnTitulos = new qx.ui.menu.Button("Espacios en Títulos ", null, null, mnuEspaciosEnTitulos);
 	mnuComisionDeTitulos.add(btnEspaciosEnTitulos);
 	
 	

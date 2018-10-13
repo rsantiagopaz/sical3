@@ -10,7 +10,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 	this.setLayout(new qx.ui.layout.Canvas());
 	
 	this.addListenerOnce("appear", function(e){
-		cboTituloD.focus();
+		cboD.focus();
 	});
 	
 	
@@ -78,13 +78,13 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 		tblDest.resetSelection();
 		tblDest.setFocusedCell();
 		
-		if (lstTituloD.isSelectionEmpty()) {
+		if (lstD.isSelectionEmpty()) {
 			tableModelDest.setDataAsMapArray([], true);
 			lengthDest = null;
 			functionSeleccion();
 		} else {
 			var p = {};
-			p.id_titulo = lstTituloD.getModelSelection().getItem(0);
+			p.id_titulo = lstD.getModelSelection().getItem(0);
 			
 			var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaCargosxTitulo");
 			rpc.addListener("completed", function(e){
@@ -106,15 +106,15 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 	var functionSeleccion = function() {
 		if (lengthDest == null) {
 			gbxAfin.setEnabled(false);
-			gbxCargo.setEnabled(false);
+			gbxAgregar.setEnabled(false);
 		} else if (lengthDest == 0) {
 			gbxAfin.setEnabled(true);
-			gbxCargo.setEnabled(true);
+			gbxAgregar.setEnabled(true);
 			
 			dialog.Dialog.warning("Atención<br/><br/>Luego de editar las incumbencias respectivas debe Confirmar los cambios realizados.");
 		} else {
 			gbxAfin.setEnabled(false);
-			gbxCargo.setEnabled(true);
+			gbxAgregar.setEnabled(true);
 		}
 	}
 	
@@ -172,13 +172,13 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 	
 	composite3.add(new qx.ui.basic.Label("Título:"), {left: 0, top: 0});
 	
-	var cboTituloD = new sical3.comp.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.ComisionDeTitulos", methodName: "autocompletarTitulo"});
-	cboTituloD.getChildControl("popup").addListener("disappear", functionDest_disappear);
-	var lstTituloD = cboTituloD.getChildControl("list");
-	lstTituloD.addListener("changeSelection", function(e){
-		if (lstTituloD.isSelectionEmpty()) functionDest_disappear();
+	var cboD = new sical3.comp.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.ComisionDeTitulos", methodName: "autocompletarTitulo"});
+	cboD.getChildControl("popup").addListener("disappear", functionDest_disappear);
+	var lstD = cboD.getChildControl("list");
+	lstD.addListener("changeSelection", function(e){
+		if (lstD.isSelectionEmpty()) functionDest_disappear();
 	}, this);
-	composite3.add(cboTituloD, {left: 70, top: 0, right: "25%"});
+	composite3.add(cboD, {left: 70, top: 0, right: "25%"});
 	
 	
 	
@@ -208,7 +208,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 										var rowData = tableModelDest.getRowDataAsMap(tblDest.getFocusedRow());
 										
 										var p = {};
-										p.cargo = lstTituloD.getSelection()[0].getUserData("datos");
+										p.cargo = lstD.getSelection()[0].getUserData("datos");
 										p.titulo = [rowData];
 										
 										//alert(qx.lang.Json.stringify(p, null, 2));
@@ -275,7 +275,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 				var rowData = tableModelDest.getRowDataAsMap(focusedRow);
 				
 				var p = {};
-				p.cargo = lstTituloD.getSelection()[0].getUserData("datos");
+				p.cargo = lstD.getSelection()[0].getUserData("datos");
 				p.titulo = [rowData];
 				
 				//alert(qx.lang.Json.stringify(p, null, 2));
@@ -395,7 +395,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 	
 	var btnAgregarAfin = new qx.ui.form.Button("Agregar cargos desde título afín...");
 	btnAgregarAfin.addListener("execute", function(e){
-		var win = new sical3.comp.windowTituloAfin();
+		var win = new sical3.comp.windowCargosxTituloAfin();
 		win.setModal(true);
 		win.addListener("aceptado", function(e){
 			var data = e.getData();
@@ -428,7 +428,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 				dialog.Dialog.confirm("Desea incluir los cargos seleccionados en el título destino?", function(e){
 					if (e) {
 						var p = {};
-						p.titulo = lstTituloD.getSelection()[0].getUserData("datos");
+						p.titulo = lstD.getSelection()[0].getUserData("datos");
 						p.cargo = tableModelDest.getDataAsMapArray();
 						
 						alert(qx.lang.Json.stringify(p, null, 2));
@@ -438,13 +438,13 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 						rpc.addListener("completed", function(e){
 							var data = e.getData();
 							
-							lstTituloD.resetSelection();
-							cboTituloD.setValue("");
+							lstD.resetSelection();
+							cboD.setValue("");
 							
 							tableModelDest.setDataAsMapArray([], true);
 							
 							dialog.Dialog.alert("El alta de cargos para el título destino se ha realizado con éxito.", function(e){
-								cboTituloD.focus();
+								cboD.focus();
 							});
 						});
 						rpc.callAsyncListeners(true, "guardar_cargos", p);
@@ -462,59 +462,59 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 
 
 	var layout = new qx.ui.layout.Grid(6, 6);
-	var gbxCargo = new qx.ui.groupbox.GroupBox("Agregar cargo");
-	gbxCargo.setLayout(layout);
-	gbxCargo.setEnabled(false);
-	this.add(gbxCargo, {left: "53%", right: 0, bottom: 0});
+	var gbxAgregar = new qx.ui.groupbox.GroupBox("Agregar cargo");
+	gbxAgregar.setLayout(layout);
+	gbxAgregar.setEnabled(false);
+	this.add(gbxAgregar, {left: "53%", right: 0, bottom: 0});
 
 
-	gbxCargo.add(new qx.ui.basic.Label("Cargo:"), {row: 0, column: 0});
+	gbxAgregar.add(new qx.ui.basic.Label("Cargo:"), {row: 0, column: 0});
 	
-	var cboCargo = new sical3.comp.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.ComisionDeTitulos", methodName: "autocompletarCargo"});
-	var lstCargo = cboCargo.getChildControl("list");
-	lstCargo.addListener("changeSelection", function(e){
-		if (lstCargo.isSelectionEmpty()) {
+	var cboAgregar = new sical3.comp.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.ComisionDeTitulos", methodName: "autocompletarCargo"});
+	var lstAgregar = cboAgregar.getChildControl("list");
+	lstAgregar.addListener("changeSelection", function(e){
+		if (lstAgregar.isSelectionEmpty()) {
 
 		} else {
 
 		}
 	}, this);
-	gbxCargo.add(cboCargo, {row: 0, column: 1, colSpan: 4});
+	gbxAgregar.add(cboAgregar, {row: 0, column: 1, colSpan: 4});
 	layout.setColumnFlex(1, 1);
 	
 	
 	
 	
-	gbxCargo.add(new qx.ui.basic.Label("Tipo clasificación:"), {row: 1, column: 0});
+	gbxAgregar.add(new qx.ui.basic.Label("Tipo clasificación:"), {row: 1, column: 0});
 	
 	var slbTipo_clasificacion = new qx.ui.form.SelectBox();
 	for (var x in application.tipo_clasificacion) {
 		//var item = new qx.ui.form.ListItem(application.tipo_clasificacion[x].denominacion, null, application.tipo_clasificacion[x]);
 		slbTipo_clasificacion.add(new qx.ui.form.ListItem(application.tipo_clasificacion[x].descrip, null, application.tipo_clasificacion[x]));
 	}
-	gbxCargo.add(slbTipo_clasificacion, {row: 1, column: 1});
+	gbxAgregar.add(slbTipo_clasificacion, {row: 1, column: 1});
 	layout.setColumnFlex(1, 1);
 	
 	
 	
-	gbxCargo.add(new qx.ui.basic.Label("Tipo título:"), {row: 1, column: 2});
+	gbxAgregar.add(new qx.ui.basic.Label("Tipo título:"), {row: 1, column: 2});
 	
 	var slbTipo_titulo = new qx.ui.form.SelectBox();
 	for (var x in application.tipo_titulo) {
 		//var item = new qx.ui.form.ListItem(application.tipo_clasificacion[x].denominacion, null, application.tipo_clasificacion[x]);
 		slbTipo_titulo.add(new qx.ui.form.ListItem(application.tipo_titulo[x].descrip, null, application.tipo_titulo[x]));
 	}
-	gbxCargo.add(slbTipo_titulo, {row: 1, column: 3});
+	gbxAgregar.add(slbTipo_titulo, {row: 1, column: 3});
 	layout.setColumnFlex(3, 1);
 	
 	
 	var btnAgregar = new qx.ui.form.Button("Agregar");
 	btnAgregar.addListener("execute", function(e){
-		if (lstCargo.isSelectionEmpty()) {
-			cboCargo.focus();
+		if (lstAgregar.isSelectionEmpty()) {
+			cboAgregar.focus();
 		} else {
 			
-			var datos = lstCargo.getSelection()[0].getUserData("datos");
+			var datos = lstAgregar.getSelection()[0].getUserData("datos");
 			var tipo_clasificacion = slbTipo_clasificacion.getSelection()[0].getModel();
 			var tipo_titulo = slbTipo_titulo.getSelection()[0].getModel();
 			
@@ -540,13 +540,13 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 					tblDest.focus();
 					//selectionModelDest.setSelectionInterval(focusedRow, focusedRow);
 					
-					lstCargo.resetSelection();
-					cboCargo.setValue("");
-					cboCargo.focus();
+					lstAgregar.resetSelection();
+					cboAgregar.setValue("");
+					cboAgregar.focus();
 				} else {
 
 					var p = {};
-					p.titulo = lstTituloD.getSelection()[0].getUserData("datos");
+					p.titulo = lstD.getSelection()[0].getUserData("datos");
 					p.cargo = [rowData];
 					
 					alert(qx.lang.Json.stringify(p, null, 2));
@@ -559,14 +559,14 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 						if (data.result.id_tomo_cargo != null) {
 							functionDest_disappear(null, data.result.id_tomo_cargo);
 							
-							dialog.Dialog.alert("El alta se registro con éxito.", function(e){cboCargo.focus();});
+							dialog.Dialog.alert("El alta se registro con éxito.", function(e){cboAgregar.focus();});
 						} else {
-							dialog.Dialog.alert("Se ha generado una novedad que estará pendiente de confirmación.", function(e){cboCargo.focus();});
+							dialog.Dialog.alert("Se ha generado una novedad que estará pendiente de confirmación.", function(e){cboAgregar.focus();});
 						}
 						
-						lstCargo.resetSelection();
-						cboCargo.setValue("");
-						cboCargo.focus();
+						lstAgregar.resetSelection();
+						cboAgregar.setValue("");
+						cboAgregar.focus();
 					});
 					rpc.addListener("failed", function(e){
 						var data = e.getData();
@@ -582,13 +582,13 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 					
 				} else {
 					dialog.Dialog.warning("Ya existe el cargo seleccionado en el título seleccionado.", function(e){
-						cboCargo.focus();
+						cboAgregar.focus();
 					});
 				}
 			}
 		}
 	})
-	gbxCargo.add(btnAgregar, {row: 2, column: 4});
+	gbxAgregar.add(btnAgregar, {row: 2, column: 4});
 	
 	
 	
@@ -596,9 +596,9 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 	
 	
 	
-	cboTituloD.setTabIndex(1);
+	cboD.setTabIndex(1);
 	tblDest.setTabIndex(3);
-	cboCargo.setTabIndex(4);
+	cboAgregar.setTabIndex(4);
 	slbTipo_clasificacion.setTabIndex(5);
 	slbTipo_titulo.setTabIndex(6);
 	btnAgregar.setTabIndex(7);
