@@ -431,10 +431,10 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 						p.titulo = lstD.getSelection()[0].getUserData("datos");
 						p.cargo = tableModelDest.getDataAsMapArray();
 						
-						alert(qx.lang.Json.stringify(p, null, 2));
-						return;
+						//alert(qx.lang.Json.stringify(p, null, 2));
+						//return;
 						
-						var rpc = new sical3.comp.rpc.Rpc("services/", "comp.ComisionDeTitulos");
+						var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaCargosxTitulo");
 						rpc.addListener("completed", function(e){
 							var data = e.getData();
 							
@@ -447,6 +447,13 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 								cboD.focus();
 							});
 						});
+						
+						rpc.addListener("failed", function(e){
+							var data = e.getData();
+							
+							alert(qx.lang.Json.stringify(data, null, 2));
+						});
+						
 						rpc.callAsyncListeners(true, "guardar_cargos", p);
 					}
 				});
@@ -549,8 +556,8 @@ qx.Class.define("sical3.comp.pageIncumbenciaCargosxTitulo",
 					p.titulo = lstD.getSelection()[0].getUserData("datos");
 					p.cargo = [rowData];
 					
-					alert(qx.lang.Json.stringify(p, null, 2));
-					return
+					//alert(qx.lang.Json.stringify(p, null, 2));
+					//return
 					
 					var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaCargosxTitulo");
 					rpc.addListener("completed", function(e){
